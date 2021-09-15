@@ -1,27 +1,15 @@
-# .github/workflows/gradle-build-pr.yml
-name: Run Gradle on pushes
-on: push
+on:
+  # Trigger on every pull request and on push
+  # to the `main` branch.
+  pull_request:
+  push:
+    branches:
+      - main
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup Java
-      uses: actions/setup-java@v1
-      with:
-        java-version: 13
-    - name: Build with Gradle
-      uses: eskatos/gradle-command-action@v1
-      with:
-        arguments: :TeamCode:assemble
-        wrapper-cache-enabled: true
-        dependencies-cache-enabled: true
-        configuration-cache-enabled: true
-        build-root-directory: .
-        wrapper-directory: .
-        gradle-version: 6.5
-    - name: Upload Artificts
-      uses: actions/upload-artifact@v2
-      with:
-        name: TeamCode-release.apk
-        path: FtcRobotController-master/TeamCode/build/outputs/apk/release/TeamCode-release.apk
+      - name: Checkout the code
+        uses: actions/checkout@v2
+      - name: Build the app
+        run: ./gradlew build

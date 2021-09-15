@@ -17,8 +17,8 @@ jobs:
         wrapper-cache-enabled: true
         dependencies-cache-enabled: true
         configuration-cache-enabled: true
-        build-root-directory: FtcRobotController-master/
-        wrapper-directory: FtcRobotController-master/
+        build-root-directory: .
+        wrapper-directory: .
         gradle-version: 6.5
     - name: Upload Artificts
       uses: actions/upload-artifact@v2

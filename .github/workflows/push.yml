@@ -17,3 +17,5 @@ jobs:
           ndk-version: r21e
       - name: Build the app
         run: bash ./gradlew build
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}

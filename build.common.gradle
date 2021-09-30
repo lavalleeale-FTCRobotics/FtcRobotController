@@ -21,9 +21,9 @@ apply plugin: 'com.android.application'
 
 android {
 
-    dexOptions {
-        javaMaxHeapSize "4G"
-    }
+    //dexOptions {
+    //    javaMaxHeapSize "4G"
+    //}
     compileSdkVersion 29
 
     signingConfigs {

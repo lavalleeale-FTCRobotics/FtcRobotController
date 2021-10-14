@@ -46,7 +46,7 @@ public class ExampleAuto extends LinearOpMode {
     private void turn(int degrees){
         if(degrees == 0)
             throw new IllegalArgumentException();
-        if(degrees > 0) {
+        if(degrees < 0) {
             FRMotor.setPower(0.5);
             BRMotor.setPower(0.5);
             FLMotor.setPower(-0.5);

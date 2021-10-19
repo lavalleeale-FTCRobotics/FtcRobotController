@@ -17,12 +17,12 @@ import java.util.Locale;
 
 public class OpenCVLoader {
     private OpenCvCamera phoneCam;
-    protected OptimizedOpenCVPipeline pipeline;
+    public OptimizedOpenCVPipeline pipeline;
     private HardwareMap map;
     private Point translation = null;
     private final boolean RUN_ON_APP;
 
-    protected OpenCVLoader(HardwareMap map, boolean RUN_ON_APP, OptimizedOpenCVPipeline pipeline){
+    public OpenCVLoader(HardwareMap map, boolean RUN_ON_APP, OptimizedOpenCVPipeline pipeline){
         this.map = map;
         this.RUN_ON_APP = RUN_ON_APP;
         this.pipeline = pipeline;

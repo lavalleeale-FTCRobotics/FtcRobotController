@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+<<<<<<< Updated upstream
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -62,3 +63,34 @@ public class ExampleAuto extends LinearOpMode {
         setMotorPower(0);
     }
 }
+=======
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.checkerframework.checker.nullness.Opt;
+import org.firstinspires.ftc.internal.OptimizedController;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.main.pipelines.FinalWABOTPipeline;
+import org.firstinspires.ftc.teamcode.internal.OpenCVLoader;
+
+@Autonomous(name = "Example Auto")
+public class ExampleAuto extends LinearOpMode {
+    DcMotor DuckSpinner;
+    Telemetry.Log log;
+    private OpenCVLoader loader;
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        loader = new OpenCVLoader(hardwareMap, true, new FinalWABOTPipeline());
+        log = telemetry.log();
+        waitForStart();
+        log.add(loader.pipeline.getVisionOutput());
+    }
+}
+>>>>>>> Stashed changes

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.examples;
 
 import org.firstinspires.ftc.internal.ControllerMapping;
 import org.firstinspires.ftc.internal.Experimental;
-import org.firstinspires.ftc.teamcode.internal.OptimizedController;
+import org.firstinspires.ftc.internal.OptimizedController;
 
 import java.util.HashMap;
 

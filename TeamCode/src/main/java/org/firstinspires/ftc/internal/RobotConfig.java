@@ -1,8 +1,7 @@
-package org.firstinspires.ftc.teamcode.internal;
+package org.firstinspires.ftc.internal;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
-import org.firstinspires.ftc.teamcode.internal.OptimizedController;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,13 +10,13 @@ import java.util.List;
 /**
  * This is the OFFICIAL robot settings file: for anything you need to change, you'll probably come here.
  * This file holds details about hardware names and about certain measurements on the robot that will need to be tuned each year.
- *
+ * <p>
  * TODO: READ VVVV
  * This file is used for attributes that affect EVERY op mode! If you want to add/remove attributes, keep this in mind!!
  *
  * @author Owen_Boseley
- *
- *
+ * <p>
+ * <p>
  * TODO: READ THIS vvvv
  * NOTE: The Standard Convention for Motor placement is FL, FR, BL ,BR
  * NOTE: The standard naming convention has changed from FLMotor to frontLeftMotor.

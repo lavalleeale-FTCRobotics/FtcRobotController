@@ -9,12 +9,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.checkerframework.checker.nullness.Opt;
-import org.firstinspires.ftc.internal.ControllerMapping;
+import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
 import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
-import org.firstinspires.ftc.teamcode.internal.OptimizedController;;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "Motor Speed Test")

@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.internal;
+package org.firstinspires.ftc.internal;
 
-import org.firstinspires.ftc.teamcode.internal.OpenCVBuilder;
 import org.opencv.core.Mat;
 import org.openftc.easyopencv.OpenCvPipeline;
 
@@ -16,6 +15,7 @@ public abstract class OptimizedOpenCVPipeline extends OpenCvPipeline {
 
     /**
      * Internal method to get this output
+     *
      * @return The output token
      */
     public String getVisionOutput() {
@@ -24,6 +24,7 @@ public abstract class OptimizedOpenCVPipeline extends OpenCvPipeline {
 
     /**
      * The normal processing method
+     *
      * @param input The input image from the camera
      * @return The image to show to the phone
      */

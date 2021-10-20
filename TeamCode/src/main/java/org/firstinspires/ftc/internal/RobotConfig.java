@@ -1,6 +1,8 @@
-package org.firstinspires.ftc.internal;
+package org.firstinspires.ftc.teamcode.internal;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+import org.firstinspires.ftc.teamcode.internal.OptimizedController;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,19 +27,22 @@ public class RobotConfig {
 
 
     // TODO: Please add your desired motor directions into this array in the form {FL, FR, BL ,BR}.
-    protected static final Direction[] motorDirections = {Direction.REVERSE, Direction.FORWARD, Direction.REVERSE, Direction.FORWARD};
+    public static final DcMotorSimple.Direction[] motorDirections = {Direction.REVERSE, Direction.FORWARD, Direction.REVERSE, Direction.FORWARD};
 
     // TODO: Please enter the radius of the wheels in INCHES.
-    protected static final double WHEEL_RADIUS = 5.15;
+    public static final double WHEEL_RADIUS = 5.15;
 
     // FROM ULTIMATE GOAL -- DELETE IF YOU WANT
     public static final double IDEAL_SHOOTING_LINE_POWER = 1720;
 
     // TODO: Please enter the number of ticks per revolution for your encoders (wheel-motor encoders, NOT odometer encoders).
-    protected static final double ENCODER_TICK_PER_REV = 1680;
+    public static final double ENCODER_TICK_PER_REV = 1680;
 
     // TODO: If you have a webcam, please enter here. If not, set this variable to null.
-    public static final String WEBCAM_NAME = "Webcam 1";
+    protected static final String WEBCAM_NAME = "Webcam 1";
+
+    // Used in 2021 Ultimate Goal for Louis to be able to override driver 1 if held down
+    public static final OptimizedController.Key NUCLEAR_KEY = OptimizedController.Key.RIGHT_BUMPER;
 
     public static final List<Double> WOBBLE_GRABBER_IN = Arrays.asList(0.45, 0.5, 0.0, 0.5);
 

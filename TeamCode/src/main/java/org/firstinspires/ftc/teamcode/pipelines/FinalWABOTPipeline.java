@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.main.pipelines;
+package org.firstinspires.ftc.teamcode.pipelines;
 
-import org.firstinspires.ftc.teamcode.internal.OpenCVBuilder;
-import org.firstinspires.ftc.teamcode.internal.OptimizedOpenCVPipeline;
+import org.firstinspires.ftc.internal.OpenCVBuilder;
+import org.firstinspires.ftc.internal.OptimizedOpenCVPipeline;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 

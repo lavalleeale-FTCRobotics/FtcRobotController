@@ -1,28 +1,21 @@
-package org.firstinspires.ftc.teamcode.internal;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+package org.firstinspires.ftc.internal;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.internal.RobotConfig;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.firstinspires.ftc.teamcode.internal.OptimizedOpenCVPipeline;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvPipeline;
-
-import java.util.Locale;
 
 public class OpenCVLoader {
     private OpenCvCamera phoneCam;
     public OptimizedOpenCVPipeline pipeline;
-    private HardwareMap map;
-    private Point translation = null;
+    private final HardwareMap map;
+    private final Point translation = null;
     private final boolean RUN_ON_APP;
 
-    public OpenCVLoader(HardwareMap map, boolean RUN_ON_APP, OptimizedOpenCVPipeline pipeline){
+    public OpenCVLoader(HardwareMap map, boolean RUN_ON_APP, OptimizedOpenCVPipeline pipeline) {
         this.map = map;
         this.RUN_ON_APP = RUN_ON_APP;
         this.pipeline = pipeline;
@@ -31,7 +24,7 @@ public class OpenCVLoader {
 
     private void init() {
 
-        if(RUN_ON_APP){
+        if (RUN_ON_APP) {
             int cameraMonitorViewId = map.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", map.appContext.getPackageName());
             phoneCam = OpenCvCameraFactory.getInstance().createWebcam(map.get(WebcamName.class, RobotConfig.WEBCAM_NAME), cameraMonitorViewId);
         } else {
@@ -41,11 +34,6 @@ public class OpenCVLoader {
 
         phoneCam.setPipeline(pipeline);
 
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-            }
-        });
+        phoneCam.openCameraDeviceAsync(() -> phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT));
     }
 }

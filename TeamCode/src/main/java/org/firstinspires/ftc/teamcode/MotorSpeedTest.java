@@ -9,8 +9,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.checkerframework.checker.nullness.Opt;
 import org.firstinspires.ftc.internal.OptimizedController;
+import org.firstinspires.ftc.internal.OptimizedRobot;
+import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
+import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "Motor Speed Test")
@@ -19,12 +21,14 @@ public class MotorSpeedTest extends OpMode {
     Telemetry.Log log;
     OptimizedController controller;
     double test = 1;
+    private OptimizedRobot robot;
 
     @Override
     public void init() {
+        robot = new OptimizedRobot(gamepad1, gamepad2, telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
         DuckSpinner = hardwareMap.dcMotor.get("Duck spinner");
         log = telemetry.log();
-        controller = new OptimizedController(gamepad1);
+//        controller = robot.setUpVirtualController(gamepad1, OptimizedController.Key.A);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

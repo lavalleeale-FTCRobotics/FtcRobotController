@@ -3,32 +3,40 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.internal.OptimizedController;
+import org.firstinspires.ftc.internal.OptimizedRobot;
+import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
+import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
 
 import java.util.Arrays;
 
-@TeleOp(name = "Test TeleOP")
+@TeleOp(name = "Example TeleOP")
 public class ExampleTeleOp extends OpMode {
     DcMotor FLMotor;
     DcMotor FRMotor;
     DcMotor BLMotor;
     DcMotor BRMotor;
+    OptimizedRobot robot;
+    OptimizedController controller;
 
     @Override
     public void init() {
-        FLMotor = hardwareMap.dcMotor.get("FLMotor");
-        FRMotor = hardwareMap.dcMotor.get("FRMotor");
-        FRMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        BLMotor = hardwareMap.dcMotor.get("BLMotor");
-        BRMotor = hardwareMap.dcMotor.get("BRMotor");
-        BRMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        robot = new OptimizedRobot(gamepad1, gamepad2, telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
+        BRMotor = robot.getMotor("BRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.FORWARD);
+        FRMotor = robot.getMotor("FRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.FORWARD);
+        FLMotor = robot.getMotor("FLMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.REVERSE);
+        BLMotor = robot.getMotor("BLMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.REVERSE);
+        controller = new OptimizedController(gamepad1);
     }
 
     @Override
     public void loop() {
-        double drive = gamepad1.left_stick_y;
-        double strafe = -gamepad1.left_stick_x;
-        double twist = -gamepad1.right_stick_x;
+        double drive = controller.getFloat(OptimizedController.Key.LEFT_STICK_Y);
+        double strafe = -controller.getFloat(OptimizedController.Key.LEFT_STICK_X);
+        double twist = -controller.getFloat(OptimizedController.Key.RIGHT_STICK_X);
         double[] speeds = {
                 (drive + strafe + twist),
                 (drive - strafe - twist),
@@ -44,7 +52,8 @@ public class ExampleTeleOp extends OpMode {
                 speeds[i] /= max;
             }
         }
-        telemetry.log().add(Arrays.toString(speeds));
+        telemetry.log().add(String.valueOf(controller.getFloat(OptimizedController.Key.LEFT_STICK_Y)));
+        telemetry.log().add(String.valueOf(gamepad1.left_stick_y));
         FLMotor.setPower(speeds[0]);
         FRMotor.setPower(speeds[1]);
         BLMotor.setPower(speeds[2]);

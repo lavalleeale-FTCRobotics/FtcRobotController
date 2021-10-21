@@ -28,7 +28,7 @@ public class MotorSpeedTest extends OpMode {
         robot = new OptimizedRobot(gamepad1, gamepad2, telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
         DuckSpinner = hardwareMap.dcMotor.get("Duck spinner");
         log = telemetry.log();
-        controller = robot.setUpVirtualController(gamepad1, OptimizedController.Key.A);
+//        controller = robot.setUpVirtualController(gamepad1, OptimizedController.Key.A);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

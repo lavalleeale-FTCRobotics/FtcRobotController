@@ -22,21 +22,7 @@ public class OptimizedController {
      */
     private Gamepad internalGamepad = null;
 
-    /**
-     * The two gamepads
-     */
-    private final Gamepad gamepad1;
-    private final Gamepad gamepad2;
 
-    /**
-     * Our start key
-     */
-    private final Key startKey;
-
-    /**
-     * Required gamepad
-     */
-    private final Gamepad requiredGamepad;
 
     /**
      * Hashmaps used in storing internal boolean states for our gamepad keys
@@ -55,11 +41,8 @@ public class OptimizedController {
      *
      * @param requiredGamepad If assigned a value, on that gamepad can use this controller -- null if you want this to be optional
      */
-    public OptimizedController(Gamepad requiredGamepad, Key startKey, Gamepad gamepad1, Gamepad gamepad2) {
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
-        this.requiredGamepad = requiredGamepad;
-        this.startKey = startKey;
+    public OptimizedController(Gamepad requiredGamepad) {
+        this.internalGamepad = requiredGamepad;
         {
             canToggleList.put(Key.START, true);
             canToggleList.put(Key.A, true);
@@ -166,17 +149,6 @@ public class OptimizedController {
      */
     protected void setInternalGamepad(Gamepad gamepad) {
         this.internalGamepad = gamepad;
-    }
-
-    /**
-     * Will automatically search to see if a gamepad has corrected pressed the buttons to activate this virtual controller
-     */
-    public void updateInternalGamepad() {
-        if (gamepad1.start && getBool(startKey, gamepad1) && requiredGamepad.equals(gamepad1)) {
-            internalGamepad = gamepad1;
-        } else if (gamepad2.start && getBool(startKey, gamepad2) && requiredGamepad.equals(gamepad2)) {
-            internalGamepad = gamepad2;
-        }
     }
 
     /**

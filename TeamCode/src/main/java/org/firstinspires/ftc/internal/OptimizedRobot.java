@@ -148,29 +148,6 @@ public class OptimizedRobot {
     }
 
     /**
-     * Sets up a virtual controller with a given start key (START + KEY to activate)
-     *
-     * @param requiredGamepad If you want a required gamepad (1 or 2) to use this, then tada!
-     * @param startKey        The START + this key to activate this virtual controller
-     * @return The controller obj
-     */
-    public OptimizedController setUpVirtualController(Gamepad requiredGamepad, OptimizedController.Key startKey) {
-        OptimizedController o = new OptimizedController(requiredGamepad, startKey, gamepad1, gamepad2);
-        controllers.add(o);
-        return o;
-    }
-
-    /**
-     * This method will iterate through our virtual controllers looking for when a gamepad hits the correct START + startKey combo to activate the controller
-     * This method is pertinent to correct teleop functionality!!!
-     */
-    public void updateVirtualControllerStartup() {
-        for (OptimizedController controller : controllers) {
-            controller.updateInternalGamepad();
-        }
-    }
-
-    /**
      * Constructor oi this class
      *
      * @param gamepad1    The gamepad1 var inherited from OpMode/LinearOpMode

@@ -174,11 +174,8 @@ public class OptimizedController {
             return false;
         for (Key k : canToggleList.keySet()) {
             if (key == k) {
-                if (getBool(key) && canToggleList.get(key)) {
+                if (getOnPress(key) && canToggleList.get(key)) {
                     toggledList.replace(key, !toggledList.get(key));
-                    canToggleList.replace(key, false);
-                } else if (!getBool(key)) {
-                    canToggleList.replace(key, true);
                 }
                 return toggledList.get(key);
             }
@@ -303,7 +300,8 @@ public class OptimizedController {
         for (Key k : beforeStateList.keySet()) {
             if (k == key) {
                 if (!beforeStateList.get(key) && getBool(key)) {
-                    return beforeStateList.replace(key, true);
+                    beforeStateList.replace(key, true);
+                    return true;
                 } else {
                     beforeStateList.replace(key, getBool(key));
                     return false;

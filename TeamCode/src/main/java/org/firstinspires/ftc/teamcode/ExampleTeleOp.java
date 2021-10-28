@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -8,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedRobot;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
 import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
 
@@ -21,6 +26,7 @@ public class ExampleTeleOp extends OpMode {
     DcMotor BRMotor;
     OptimizedRobot robot;
     OptimizedController controller;
+    Telemetry.Log log;
 
     @Override
     public void init() {
@@ -30,8 +36,10 @@ public class ExampleTeleOp extends OpMode {
         FLMotor = robot.getMotor("FLMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.REVERSE);
         BLMotor = robot.getMotor("BLMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.REVERSE);
         controller = new OptimizedController(gamepad1);
+        log = telemetry.log();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void loop() {
         double drive = controller.getFloat(OptimizedController.Key.LEFT_STICK_Y);
@@ -52,8 +60,6 @@ public class ExampleTeleOp extends OpMode {
                 speeds[i] /= max;
             }
         }
-        telemetry.log().add(String.valueOf(controller.getFloat(OptimizedController.Key.LEFT_STICK_Y)));
-        telemetry.log().add(String.valueOf(gamepad1.left_stick_y));
         FLMotor.setPower(speeds[0]);
         FRMotor.setPower(speeds[1]);
         BLMotor.setPower(speeds[2]);

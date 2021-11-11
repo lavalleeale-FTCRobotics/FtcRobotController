@@ -20,49 +20,32 @@ import java.util.Arrays;
 
 @TeleOp(name = "Example TeleOP")
 public class ExampleTeleOp extends OpMode {
-    DcMotor FLMotor;
-    DcMotor FRMotor;
-    DcMotor BLMotor;
-    DcMotor BRMotor;
+    DcMotor duckSpinner;
+    DcMotor arm;
     OptimizedRobot robot;
     OptimizedController controller;
+    OptimizedController controller2;
     Telemetry.Log log;
 
     @Override
     public void init() {
         robot = new OptimizedRobot(gamepad1, gamepad2, telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
-        BRMotor = robot.getMotor("BRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.FORWARD);
-        FRMotor = robot.getMotor("FRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.FORWARD);
-        FLMotor = robot.getMotor("FLMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.REVERSE);
-        BLMotor = robot.getMotor("BLMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.REVERSE);
+        duckSpinner = robot.getMotor("duckSpinner");
+        arm = robot.getMotor("arm");
         controller = new OptimizedController(gamepad1);
+        controller2 = new OptimizedController(gamepad2);
         log = telemetry.log();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void loop() {
-        double drive = controller.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-        double strafe = -controller.getFloat(OptimizedController.Key.LEFT_STICK_X);
-        double twist = -controller.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-        double[] speeds = {
-                (drive + strafe + twist),
-                (drive - strafe - twist),
-                (drive - strafe + twist),
-                (drive + strafe - twist)
-        };
-        double max = Math.abs(speeds[0]);
-        for (int i = 1; i < speeds.length; i++) {
-            max = Math.max(max, Math.abs(speeds[i]));
+        if (controller.getBool(OptimizedController.Key.A)) {
+            duckSpinner.setPower(-0.6);
+        } else {
+            duckSpinner.setPower(0);
         }
-        if (max > 1) {
-            for (int i = 0; i < speeds.length; i++) {
-                speeds[i] /= max;
-            }
-        }
-        FLMotor.setPower(speeds[0]);
-        FRMotor.setPower(speeds[1]);
-        BLMotor.setPower(speeds[2]);
-        BRMotor.setPower(speeds[3]);
+        robot.updateDrive(controller, controller2, true, false, 1d, OptimizedRobot.RobotDirection.FRONT, OptimizedRobot.RobotDirection.FRONT, false);
+        arm.setPower(controller2.getFloat(OptimizedController.Key.RIGHT_STICK_Y));
     }
 }

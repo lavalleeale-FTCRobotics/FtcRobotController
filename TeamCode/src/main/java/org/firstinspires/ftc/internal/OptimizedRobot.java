@@ -399,7 +399,7 @@ public class OptimizedRobot {
      * @usage Only call this method after initialization and instantiating the robot
      * This algorithm makes gamepad 1 have standard forward controls over the robot!
      */
-    public void updateDrive(double defaultSpeedFactor) {
+    public void     updateDrive(double defaultSpeedFactor) {
 
         // If the OpMode didn't specifically initialize motors with settings, call the default one
         if (!hasUpdatedDrive && !hasInitializedMotors)
@@ -913,7 +913,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name) {
-        return internalMap.dcMotor.get(name);
+        return getMotor(name, RunMode.RUN_WITHOUT_ENCODER, Direction.FORWARD, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -934,9 +934,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, RunMode runmode) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setMode(runmode);
-        return motor;
+        return getMotor(name, runmode, Direction.FORWARD, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -947,6 +945,9 @@ public class OptimizedRobot {
      */
     public DcMotorEx getMotorEx(String name, RunMode runmode) {
         DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
+        if (runmode == RunMode.RUN_TO_POSITION) {
+            motor.setTargetPosition(0);
+        }
         motor.setMode(runmode);
         return motor;
     }
@@ -960,10 +961,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, RunMode runmode, Direction direction) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setMode(runmode);
-        motor.setDirection(direction);
-        return motor;
+        return getMotor(name, runmode, direction, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -976,6 +974,9 @@ public class OptimizedRobot {
      */
     public DcMotorEx getMotorEx(String name, RunMode runmode, Direction direction) {
         DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
+        if (runmode == RunMode.RUN_TO_POSITION) {
+            motor.setTargetPosition(0);
+        }
         motor.setMode(runmode);
         motor.setDirection(direction);
         return motor;
@@ -1002,6 +1003,9 @@ public class OptimizedRobot {
      */
     public DcMotor getMotor(String name, RunMode runmode, Direction direction, ZeroPowerBehavior brakeMode) {
         DcMotor motor = internalMap.dcMotor.get(name);
+        if (runmode == RunMode.RUN_TO_POSITION) {
+            motor.setTargetPosition(0);
+        }
         motor.setMode(runmode);
         motor.setDirection(direction);
         motor.setZeroPowerBehavior(brakeMode);
@@ -1019,6 +1023,9 @@ public class OptimizedRobot {
      */
     public DcMotorEx getMotorEx(String name, RunMode runmode, Direction direction, ZeroPowerBehavior brakeMode) {
         DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
+        if (runmode == RunMode.RUN_TO_POSITION) {
+            motor.setTargetPosition(0);
+        }
         motor.setMode(runmode);
         motor.setDirection(direction);
         motor.setZeroPowerBehavior(brakeMode);
@@ -1034,10 +1041,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, RunMode runmode, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setMode(runmode);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotor(name, runmode, Direction.FORWARD, brakeMode);
     }
 
     /**
@@ -1064,10 +1068,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, Direction direction, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setDirection(direction);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotor(name, RunMode.RUN_WITHOUT_ENCODER, direction, brakeMode);
     }
 
     /**
@@ -1093,9 +1094,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotor(name, RunMode.RUN_WITHOUT_ENCODER, Direction.FORWARD, brakeMode);
     }
 
     /**
@@ -1119,9 +1118,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, Direction direction) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setDirection(direction);
-        return motor;
+        return getMotor(name, RunMode.RUN_WITHOUT_ENCODER, direction, ZeroPowerBehavior.BRAKE);
     }
 
     /**

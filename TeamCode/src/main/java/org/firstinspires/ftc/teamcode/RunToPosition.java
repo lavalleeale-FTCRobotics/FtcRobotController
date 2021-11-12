@@ -24,7 +24,7 @@ public class RunToPosition extends OpMode {
 
     @Override
     public void init() {
-        robot = new OptimizedRobot(gamepad1, gamepad2, telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
+        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
         DuckSpinner = robot.getMotor("BRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         DuckSpinner.setTargetPosition(0);
         DuckSpinner.setMode(DcMotor.RunMode.RUN_TO_POSITION);

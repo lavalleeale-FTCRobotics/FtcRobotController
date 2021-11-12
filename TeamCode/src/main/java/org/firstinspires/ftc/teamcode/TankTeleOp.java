@@ -24,7 +24,7 @@ public class TankTeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot = new OptimizedRobot(gamepad1, gamepad2, telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
+        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
         BRMotor = robot.getMotor("BRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.FORWARD);
         FRMotor = robot.getMotor("FRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.FORWARD);
         FLMotor = robot.getMotor("FLMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.REVERSE);

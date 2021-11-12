@@ -20,8 +20,7 @@ public class OptimizedController {
     /**
      * Internal gamepad
      */
-    private Gamepad internalGamepad = null;
-
+    private Gamepad internalGamepad;
 
 
     /**
@@ -172,15 +171,10 @@ public class OptimizedController {
             return false;
         if (isDisabled(key))
             return false;
-        for (Key k : canToggleList.keySet()) {
-            if (key == k) {
-                if (getOnPress(key) && canToggleList.get(key)) {
-                    toggledList.replace(key, !toggledList.get(key));
-                }
-                return toggledList.get(key);
-            }
+        if (getOnPress(key) && canToggleList.get(key)) {
+            toggledList.replace(key, !toggledList.get(key));
         }
-        return false;
+        return toggledList.get(key);
     }
 
     /**
@@ -195,92 +189,45 @@ public class OptimizedController {
         if (isDisabled(key))
             return false;
 
-        if (key == Key.A) {
-            return internalGamepad.a;
-        } else if (key == Key.B) {
-            return internalGamepad.b;
-        } else if (key == Key.X) {
-            return internalGamepad.x;
-        } else if (key == Key.Y) {
-            return internalGamepad.y;
-        } else if (key == Key.LEFT_BUMPER) {
-            return internalGamepad.left_bumper;
-        } else if (key == Key.RIGHT_BUMPER) {
-            return internalGamepad.right_bumper;
-        } else if (key == Key.DPAD_UP) {
-            return internalGamepad.dpad_up;
-        } else if (key == Key.DPAD_DOWN) {
-            return internalGamepad.dpad_down;
-        } else if (key == Key.DPAD_LEFT) {
-            return internalGamepad.dpad_left;
-        } else if (key == Key.DPAD_RIGHT) {
-            return internalGamepad.dpad_right;
-        } else if (key == Key.START) {
-            return internalGamepad.start;
-        } else if (key == Key.BACK) {
-            return internalGamepad.back;
-        } else if (key == Key.LEFT_STICK_X) {
-            return !NumberFunctions.isZero(internalGamepad.left_stick_x);
-        } else if (key == Key.LEFT_STICK_Y) {
-            return !NumberFunctions.isZero(internalGamepad.left_stick_y);
-        } else if (key == Key.RIGHT_STICK_X) {
-            return !NumberFunctions.isZero(internalGamepad.right_stick_x);
-        } else if (key == Key.RIGHT_STICK_Y) {
-            return !NumberFunctions.isZero(internalGamepad.right_stick_y);
-        } else if (key == Key.LEFT_TRIGGER) {
-            return !NumberFunctions.isZero(internalGamepad.left_trigger);
-        } else if (key == Key.RIGHT_TRIGGER) {
-            return !NumberFunctions.isZero(internalGamepad.right_trigger);
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Gets the boolean value of a key for a specific controller
-     *
-     * @param key The key to use
-     * @return A boolean on whether or not this key is being pressed down
-     */
-    private static boolean getBool(Key key, Gamepad gamepad) {
-        if (key == Key.A) {
-            return gamepad.a;
-        } else if (key == Key.B) {
-            return gamepad.b;
-        } else if (key == Key.X) {
-            return gamepad.x;
-        } else if (key == Key.Y) {
-            return gamepad.y;
-        } else if (key == Key.LEFT_BUMPER) {
-            return gamepad.left_bumper;
-        } else if (key == Key.RIGHT_BUMPER) {
-            return gamepad.right_bumper;
-        } else if (key == Key.DPAD_UP) {
-            return gamepad.dpad_up;
-        } else if (key == Key.DPAD_DOWN) {
-            return gamepad.dpad_down;
-        } else if (key == Key.DPAD_LEFT) {
-            return gamepad.dpad_left;
-        } else if (key == Key.DPAD_RIGHT) {
-            return gamepad.dpad_right;
-        } else if (key == Key.START) {
-            return gamepad.start;
-        } else if (key == Key.BACK) {
-            return gamepad.back;
-        } else if (key == Key.LEFT_STICK_X) {
-            return !NumberFunctions.isZero(gamepad.left_stick_x);
-        } else if (key == Key.LEFT_STICK_Y) {
-            return !NumberFunctions.isZero(gamepad.left_stick_y);
-        } else if (key == Key.RIGHT_STICK_X) {
-            return !NumberFunctions.isZero(gamepad.right_stick_x);
-        } else if (key == Key.RIGHT_STICK_Y) {
-            return !NumberFunctions.isZero(gamepad.right_stick_y);
-        } else if (key == Key.LEFT_TRIGGER) {
-            return !NumberFunctions.isZero(gamepad.left_trigger);
-        } else if (key == Key.RIGHT_TRIGGER) {
-            return !NumberFunctions.isZero(gamepad.right_trigger);
-        } else {
-            return false;
+        switch (key) {
+            case A:
+                return internalGamepad.a;
+            case B:
+                return internalGamepad.b;
+            case X:
+                return internalGamepad.x;
+            case Y:
+                return internalGamepad.y;
+            case LEFT_BUMPER:
+                return internalGamepad.left_bumper;
+            case RIGHT_BUMPER:
+                return internalGamepad.right_bumper;
+            case DPAD_UP:
+                return internalGamepad.dpad_up;
+            case DPAD_DOWN:
+                return internalGamepad.dpad_down;
+            case DPAD_LEFT:
+                return internalGamepad.dpad_left;
+            case DPAD_RIGHT:
+                return internalGamepad.dpad_right;
+            case START:
+                return internalGamepad.start;
+            case BACK:
+                return internalGamepad.back;
+            case LEFT_STICK_X:
+                return !NumberFunctions.isZero(internalGamepad.left_stick_x);
+            case LEFT_STICK_Y:
+                return !NumberFunctions.isZero(internalGamepad.left_stick_y);
+            case RIGHT_STICK_X:
+                return !NumberFunctions.isZero(internalGamepad.right_stick_x);
+            case RIGHT_STICK_Y:
+                return !NumberFunctions.isZero(internalGamepad.right_stick_y);
+            case LEFT_TRIGGER:
+                return !NumberFunctions.isZero(internalGamepad.left_trigger);
+            case RIGHT_TRIGGER:
+                return !NumberFunctions.isZero(internalGamepad.right_trigger);
+            default:
+                return false;
         }
     }
 
@@ -296,19 +243,13 @@ public class OptimizedController {
             return false;
         if (isDisabled(key))
             return false;
-
-        for (Key k : beforeStateList.keySet()) {
-            if (k == key) {
-                if (!beforeStateList.get(key) && getBool(key)) {
-                    beforeStateList.replace(key, true);
-                    return true;
-                } else {
-                    beforeStateList.replace(key, getBool(key));
-                    return false;
-                }
-            }
+        if (!beforeStateList.get(key) && getBool(key)) {
+            beforeStateList.replace(key, true);
+            return true;
+        } else {
+            beforeStateList.replace(key, getBool(key));
+            return false;
         }
-        return false;
     }
 
     /**
@@ -324,18 +265,13 @@ public class OptimizedController {
         if (isDisabled(key))
             return false;
 
-        for (Key k : beforeStateList.keySet()) {
-            if (k == key) {
-                if (beforeStateList.get(key) && !getBool(key)) {
-                    beforeStateList.replace(key, false);
-                    return true;
-                } else {
-                    beforeStateList.replace(key, getBool(key));
-                    return false;
-                }
-            }
+        if (beforeStateList.get(key) && !getBool(key)) {
+            beforeStateList.replace(key, false);
+            return true;
+        } else {
+            beforeStateList.replace(key, getBool(key));
+            return false;
         }
-        return false;
     }
 
     /**
@@ -350,44 +286,45 @@ public class OptimizedController {
         if (isDisabled(key))
             return 0;
 
-        if (key == Key.LEFT_STICK_X) {
-            return internalGamepad.left_stick_x;
-        } else if (key == Key.LEFT_STICK_Y) {
-            return internalGamepad.left_stick_y;
-        } else if (key == Key.RIGHT_STICK_X) {
-            return internalGamepad.right_stick_x;
-        } else if (key == Key.RIGHT_STICK_Y) {
-            return internalGamepad.right_stick_y;
-        } else if (key == Key.LEFT_TRIGGER) {
-            return internalGamepad.left_trigger;
-        } else if (key == Key.RIGHT_TRIGGER) {
-            return internalGamepad.right_trigger;
-        } else if (key == Key.A) {
-            return internalGamepad.a ? 1 : 0;
-        } else if (key == Key.B) {
-            return internalGamepad.b ? 1 : 0;
-        } else if (key == Key.X) {
-            return internalGamepad.x ? 1 : 0;
-        } else if (key == Key.Y) {
-            return internalGamepad.y ? 1 : 0;
-        } else if (key == Key.LEFT_BUMPER) {
-            return internalGamepad.left_bumper ? 1 : 0;
-        } else if (key == Key.RIGHT_BUMPER) {
-            return internalGamepad.right_bumper ? 1 : 0;
-        } else if (key == Key.DPAD_UP) {
-            return internalGamepad.dpad_up ? 1 : 0;
-        } else if (key == Key.DPAD_DOWN) {
-            return internalGamepad.dpad_down ? 1 : 0;
-        } else if (key == Key.DPAD_LEFT) {
-            return internalGamepad.dpad_left ? 1 : 0;
-        } else if (key == Key.DPAD_RIGHT) {
-            return internalGamepad.dpad_right ? 1 : 0;
-        } else if (key == Key.START) {
-            return internalGamepad.start ? 1 : 0;
-        } else if (key == Key.BACK) {
-            return internalGamepad.back ? 1 : 0;
-        } else {
-            return 0;
+        switch (key) {
+            case LEFT_STICK_X:
+                return internalGamepad.left_stick_x;
+            case LEFT_STICK_Y:
+                return internalGamepad.left_stick_y;
+            case RIGHT_STICK_X:
+                return internalGamepad.right_stick_x;
+            case RIGHT_STICK_Y:
+                return internalGamepad.right_stick_y;
+            case LEFT_TRIGGER:
+                return internalGamepad.left_trigger;
+            case RIGHT_TRIGGER:
+                return internalGamepad.right_trigger;
+            case A:
+                return internalGamepad.a ? 1 : 0;
+            case B:
+                return internalGamepad.b ? 1 : 0;
+            case X:
+                return internalGamepad.x ? 1 : 0;
+            case Y:
+                return internalGamepad.y ? 1 : 0;
+            case LEFT_BUMPER:
+                return internalGamepad.left_bumper ? 1 : 0;
+            case RIGHT_BUMPER:
+                return internalGamepad.right_bumper ? 1 : 0;
+            case DPAD_UP:
+                return internalGamepad.dpad_up ? 1 : 0;
+            case DPAD_DOWN:
+                return internalGamepad.dpad_down ? 1 : 0;
+            case DPAD_LEFT:
+                return internalGamepad.dpad_left ? 1 : 0;
+            case DPAD_RIGHT:
+                return internalGamepad.dpad_right ? 1 : 0;
+            case START:
+                return internalGamepad.start ? 1 : 0;
+            case BACK:
+                return internalGamepad.back ? 1 : 0;
+            default:
+                return 0;
         }
     }
 }

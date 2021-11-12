@@ -8,17 +8,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
 import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
-import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
-import org.firstinspires.ftc.teamcode.pipelines.FinalWABOTPipeline;
-
-import java.util.Arrays;
 
 @TeleOp(name = "Final TeleOP")
 public class FinalTeleOp extends OpMode {
@@ -30,7 +23,7 @@ public class FinalTeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
+        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping());
         duckSpinner = robot.getMotor("duckSpinner");
         arm = robot.getMotor("arm");
         leftServo = hardwareMap.crservo.get("Left Servo");
@@ -49,8 +42,8 @@ public class FinalTeleOp extends OpMode {
             duckSpinner.setPower(0);
         }
         robot.updateDrive(controller, controller2, true, false, 1d, OptimizedRobot.RobotDirection.FRONT, OptimizedRobot.RobotDirection.FRONT, false);
-        arm.setPower(controller2.getFloat(OptimizedController.Key.RIGHT_STICK_Y) * (controller.getBool(OptimizedController.Key.RIGHT_BUMPER) ? 1: 0.4));
-        leftServo.setPower(controller2.getToggle(OptimizedController.Key.B) ? 0.5: -0.5);
-        rightServo.setPower(controller2.getToggle(OptimizedController.Key.B) ? -0.5: 0.5);
+        arm.setPower(Math.pow(controller2.getFloat(robot.getControl("Arm")), 3));
+        leftServo.setPower(controller2.getToggle(robot.getControl("Claw")) ? 0.5: -0.5);
+        rightServo.setPower(controller2.getToggle(robot.getControl("Claw")) ? -0.5: 0.5);
     }
 }

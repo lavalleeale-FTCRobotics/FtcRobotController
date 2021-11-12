@@ -11,9 +11,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedRobot;
-import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
-import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
 
 @TeleOp(name = "Run To Position")
 public class RunToPosition extends OpMode {
@@ -24,7 +23,7 @@ public class RunToPosition extends OpMode {
 
     @Override
     public void init() {
-        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
+        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping());
         DuckSpinner = robot.getMotor("BRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         DuckSpinner.setTargetPosition(0);
         DuckSpinner.setMode(DcMotor.RunMode.RUN_TO_POSITION);

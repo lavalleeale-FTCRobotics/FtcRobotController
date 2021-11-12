@@ -3,15 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
-import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
-
-import java.util.Arrays;
 
 @TeleOp(name = "Tank TeleOP")
 public class TankTeleOp extends OpMode {
@@ -24,7 +20,7 @@ public class TankTeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
+        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping());
         BRMotor = robot.getMotor("BRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.FORWARD);
         FRMotor = robot.getMotor("FRMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.FORWARD);
         FLMotor = robot.getMotor("FLMotor", DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotorSimple.Direction.REVERSE);

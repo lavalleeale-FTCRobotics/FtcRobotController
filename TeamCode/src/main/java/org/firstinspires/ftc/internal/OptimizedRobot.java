@@ -138,45 +138,11 @@ public class OptimizedRobot {
     /**
      * Constructor oi this class
      *
-     * @param telemetry   The telemetry var inherited from OpMode/LinearOpMode
-     * @param hardwareMap The hardwareMap var inherited from OpMode/LinearOpMode
+     * @param telemetry       The telemetry var inherited from OpMode/LinearOpMode
+     * @param hardwareMap     The hardwareMap var inherited from OpMode/LinearOpMode
      */
     public OptimizedRobot(Telemetry telemetry, HardwareMap hardwareMap) {
         functions = new OptimizedDriveFunctions(this);
-
-        internalMap = hardwareMap;
-        this.telemetry = telemetry;
-
-        status = RobotStatus.READY;
-    }
-
-    /**
-     * Constructor oi this class
-     *
-     * @param telemetry   The telemetry var inherited from OpMode/LinearOpMode
-     * @param hardwareMap The hardwareMap var inherited from OpMode/LinearOpMode
-     * @param controlMap  A hashmap of string names to keys for teleop -- might be useless, idk
-     */
-    public OptimizedRobot(Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap) {
-        functions = new OptimizedDriveFunctions(this);
-        this.controlMap = controlMap.initializeMapping(new HashMap<>());
-
-        internalMap = hardwareMap;
-        this.telemetry = telemetry;
-
-        status = RobotStatus.READY;
-    }
-
-    /**
-     * Constructor oi this class
-     *
-     * @param telemetry       The telemetry var inherited from OpMode/LinearOpMode
-     * @param hardwareMap     The hardwareMap var inherited from OpMode/LinearOpMode
-     * @param hardwareMapping A hashmap of hardware map names to aliases for use in op modes (to avoid to confusion)
-     */
-    public OptimizedRobot(Telemetry telemetry, HardwareMap hardwareMap, HardwareAliasMapping hardwareMapping) {
-        functions = new OptimizedDriveFunctions(this);
-        this.aliasMap = hardwareMapping.initializeMapping(new HashMap<>());
 
         internalMap = hardwareMap;
         this.telemetry = telemetry;
@@ -190,12 +156,10 @@ public class OptimizedRobot {
      * @param telemetry       The telemetry var inherited from OpMode/LinearOpMode
      * @param hardwareMap     The hardwareMap var inherited from OpMode/LinearOpMode
      * @param controlMap      A hashmap of string names to keys for teleop -- might be useless, idk
-     * @param hardwareMapping A hashmap of hardware map names to aliases for use in op modes (to avoid to confusion)
      */
-    public OptimizedRobot(Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap, HardwareAliasMapping hardwareMapping) {
+    public OptimizedRobot(Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap) {
         functions = new OptimizedDriveFunctions(this);
         this.controlMap = controlMap.initializeMapping(new HashMap<>());
-        this.aliasMap = hardwareMapping.initializeMapping(new HashMap<>());
 
         internalMap = hardwareMap;
         this.telemetry = telemetry;
@@ -439,7 +403,7 @@ public class OptimizedRobot {
         //
         double x, y, rx;
 
-        if (((!controller1.isBeingUsed() || !useController1) || (controller2CanOverride && controller2.getBool(RobotConfig.NUCLEAR_KEY))) && useController2) {
+        if (((!controller1.atRest() || !useController1) || (controller2CanOverride && controller2.getBool(RobotConfig.NUCLEAR_KEY))) && useController2) {
             controller = controller2;
             direction = controller2Dir;
         }

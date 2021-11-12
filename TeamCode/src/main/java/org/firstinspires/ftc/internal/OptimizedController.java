@@ -42,65 +42,14 @@ public class OptimizedController {
      */
     public OptimizedController(Gamepad requiredGamepad) {
         this.internalGamepad = requiredGamepad;
-        {
-            canToggleList.put(Key.START, true);
-            canToggleList.put(Key.A, true);
-            canToggleList.put(Key.B, true);
-            canToggleList.put(Key.X, true);
-            canToggleList.put(Key.Y, true);
-            canToggleList.put(Key.LEFT_BUMPER, true);
-            canToggleList.put(Key.RIGHT_BUMPER, true);
-            canToggleList.put(Key.LEFT_TRIGGER, true);
-            canToggleList.put(Key.RIGHT_TRIGGER, true);
-            canToggleList.put(Key.LEFT_STICK_X, true);
-            canToggleList.put(Key.LEFT_STICK_Y, true);
-            canToggleList.put(Key.RIGHT_STICK_X, true);
-            canToggleList.put(Key.RIGHT_STICK_Y, true);
-            canToggleList.put(Key.DPAD_UP, true);
-            canToggleList.put(Key.DPAD_DOWN, true);
-            canToggleList.put(Key.DPAD_LEFT, true);
-            canToggleList.put(Key.DPAD_RIGHT, true);
-            canToggleList.put(Key.BACK, true);
+        for (Key key : Key.values()) {
+            canToggleList.put(key, true);
         }
-        {
-            toggledList.put(Key.START, false);
-            toggledList.put(Key.A, false);
-            toggledList.put(Key.B, false);
-            toggledList.put(Key.X, false);
-            toggledList.put(Key.Y, false);
-            toggledList.put(Key.LEFT_BUMPER, false);
-            toggledList.put(Key.RIGHT_BUMPER, false);
-            toggledList.put(Key.LEFT_TRIGGER, false);
-            toggledList.put(Key.RIGHT_TRIGGER, false);
-            toggledList.put(Key.LEFT_STICK_X, false);
-            toggledList.put(Key.LEFT_STICK_Y, false);
-            toggledList.put(Key.RIGHT_STICK_X, false);
-            toggledList.put(Key.RIGHT_STICK_Y, false);
-            toggledList.put(Key.DPAD_UP, false);
-            toggledList.put(Key.DPAD_DOWN, false);
-            toggledList.put(Key.DPAD_LEFT, false);
-            toggledList.put(Key.DPAD_RIGHT, false);
-            toggledList.put(Key.BACK, false);
+        for (Key key : Key.values()) {
+            toggledList.put(key, false);
         }
-        {
-            beforeStateList.put(Key.START, false);
-            beforeStateList.put(Key.A, false);
-            beforeStateList.put(Key.B, false);
-            beforeStateList.put(Key.X, false);
-            beforeStateList.put(Key.Y, false);
-            beforeStateList.put(Key.LEFT_BUMPER, false);
-            beforeStateList.put(Key.RIGHT_BUMPER, false);
-            beforeStateList.put(Key.LEFT_TRIGGER, false);
-            beforeStateList.put(Key.RIGHT_TRIGGER, false);
-            beforeStateList.put(Key.LEFT_STICK_X, false);
-            beforeStateList.put(Key.LEFT_STICK_Y, false);
-            beforeStateList.put(Key.RIGHT_STICK_X, false);
-            beforeStateList.put(Key.RIGHT_STICK_Y, false);
-            beforeStateList.put(Key.DPAD_UP, false);
-            beforeStateList.put(Key.DPAD_DOWN, false);
-            beforeStateList.put(Key.DPAD_LEFT, false);
-            beforeStateList.put(Key.DPAD_RIGHT, false);
-            beforeStateList.put(Key.BACK, false);
+        for (Key key : Key.values()) {
+            beforeStateList.put(key, false);
         }
     }
 
@@ -112,12 +61,12 @@ public class OptimizedController {
     }
 
     /**
-     * Tells whether this controller's sticks are being used
+     * Are all analog sticks and triggers in their rest position?
      *
-     * @return a boolean on whether or not this controller is being used
+     * @return true if all analog sticks and triggers are at rest; otherwise false
      */
-    public boolean isBeingUsed() {
-        return (!NumberFunctions.isZero(getFloat(Key.LEFT_STICK_Y)) || !NumberFunctions.isZero(getFloat(Key.LEFT_STICK_X)) || !NumberFunctions.isZero(getFloat(Key.RIGHT_STICK_X)) || !NumberFunctions.isZero(getFloat(Key.RIGHT_STICK_Y)));
+    public boolean atRest() {
+        return internalGamepad.atRest();
     }
 
     /**

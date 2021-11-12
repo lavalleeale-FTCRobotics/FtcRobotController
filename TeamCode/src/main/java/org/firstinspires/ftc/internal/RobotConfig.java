@@ -31,8 +31,6 @@ public class RobotConfig {
     // TODO: Please enter the radius of the wheels in INCHES.
     public static final double WHEEL_RADIUS = 5.15;
 
-    // FROM ULTIMATE GOAL -- DELETE IF YOU WANT
-    public static final double IDEAL_SHOOTING_LINE_POWER = 1720;
 
     // TODO: Please enter the number of ticks per revolution for your encoders (wheel-motor encoders, NOT odometer encoders).
     public static final double ENCODER_TICK_PER_REV = 1680;
@@ -42,10 +40,6 @@ public class RobotConfig {
 
     // Used in 2021 Ultimate Goal for Louis to be able to override driver 1 if held down
     public static final OptimizedController.Key NUCLEAR_KEY = OptimizedController.Key.RIGHT_BUMPER;
-
-    public static final List<Double> WOBBLE_GRABBER_IN = Arrays.asList(0.45, 0.5, 0.0, 0.5);
-
-    public static final List<Double> WOBBLE_GRABBER_OUT = Arrays.asList(0.0, 1.0, 0.6, 0.15);
 
 
 }

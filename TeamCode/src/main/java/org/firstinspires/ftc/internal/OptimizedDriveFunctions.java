@@ -367,9 +367,7 @@ public class OptimizedDriveFunctions {
         robot.motors[2].setTargetPosition(ticksToRun);
         robot.motors[3].setTargetPosition(ticksToRun);
         linearDrive(power);
-        while (robot.motors[0].isBusy() || robot.motors[1].isBusy() || robot.motors[2].isBusy() || robot.motors[3].isBusy()) {
-            //This line was intentionally left blank
-        }
+        while (robot.motors[0].isBusy() || robot.motors[1].isBusy() || robot.motors[2].isBusy() || robot.motors[3].isBusy());
         stopMotors();
         robot.runWithEncoder(false);
         robot.motorDir(true);

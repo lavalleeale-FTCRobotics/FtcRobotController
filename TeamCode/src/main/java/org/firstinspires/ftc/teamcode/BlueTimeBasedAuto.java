@@ -7,11 +7,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedDriveFunctions;
 import org.firstinspires.ftc.internal.OptimizedRobot;
+import org.firstinspires.ftc.internal.RobotConfig;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
 
-@Autonomous
-public class TimeBasedAuto extends LinearOpMode {
+@Autonomous(name = "Time Based Auto (Blue)")
+public class BlueTimeBasedAuto extends LinearOpMode {
 
     DcMotor duckSpinner;
 
@@ -35,23 +36,29 @@ public class TimeBasedAuto extends LinearOpMode {
 
         waitForStart();
 
-        duckSpinner.setPower(-0.6);
+        robot.getDriveFunctions().linearDrive(-0.6f);
 
-        sleep(1500);
+        sleep(100);
 
-        duckSpinner.setPower(0);
+        robot.getDriveFunctions().stopMotors();
+
+        duckSpinner.setPower(-RobotConfig.SPINNER_SPEED);
+
+        sleep(4000);
 
         robot.getDriveFunctions().linearDrive(0.9f);
 
         sleep(350);
 
+        duckSpinner.setPower(0);
+
         robot.getDriveFunctions().turn(OptimizedDriveFunctions.Direction.LEFT, 0.7);
 
-        sleep(420);
+        sleep(350);
 
-        robot.getDriveFunctions().linearDrive(0.9f);
+        robot.getDriveFunctions().linearDrive(0.4f);
 
-        sleep(2000);
+        sleep(5500);
 
         robot.getDriveFunctions().stopMotors();
     }

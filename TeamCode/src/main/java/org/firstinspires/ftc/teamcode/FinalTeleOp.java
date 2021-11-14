@@ -21,9 +21,11 @@ public class FinalTeleOp extends OpMode {
     OptimizedController controller, controller2;
     CRServo leftServo, rightServo;
     Telemetry.Log log;
-    boolean direction = true;
-    int armLowPoint = -128;
-    int armHighPoint = -2100;
+    int armLowPoint = 128;
+    int armMidPoint = 300;
+    int armHighPoint = 900;
+    int backPosition = -3000;
+    int offset = 0;
 
     @Override
     public void init() {
@@ -44,33 +46,43 @@ public class FinalTeleOp extends OpMode {
         // Duck Spinner
         if (controller2.getBool(robot.getControl("Duck"))) {
             duckSpinner.setPower(RobotConfig.SPINNER_SPEED);
+        } else if (controller2.getBool(robot.getControl("ReverseDuck"))) {
+            duckSpinner.setPower(-RobotConfig.SPINNER_SPEED);
         } else {
-            duckSpinner.setPower(0);
+            duckSpinner.setPower(controller2.getFloat(robot.getControl("DuckSpeedReverse")) - controller2.getFloat(robot.getControl("DuckSpeed")));
         }
 
         // Arm
+        // If manual arm control is off and the Arm Snap button is pressed swap position
         if (controller2.getToggle(robot.getControl("ArmControl"))) {
-            // Manual Arm Control
+            // Set Power to "ArmSmooth" Float
             arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             arm.setPower(controller2.getFloat(robot.getControl("ArmSmooth")));
         } else {
-            // Run to Full position with maximum power
+            // Run to position with maximum power
             arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            arm.setPower(1d);
+            arm.setPower(0.7);
+            if (controller2.getToggle(robot.getControl("ArmSwap"))) {
+                arm.setTargetPosition(controller2.getToggle(robot.getControl("ArmSnap")) ? offset + backPosition + (controller2.getToggle(robot.getControl("ArmMid")) ? armMidPoint : armHighPoint) : offset + backPosition + armLowPoint);
+            } else {
+                arm.setTargetPosition(controller2.getToggle(robot.getControl("ArmSnap")) ? offset - (controller2.getToggle(robot.getControl("ArmMid")) ? armMidPoint : armHighPoint): offset - armLowPoint);
+            }
         }
-        // If manual arm control is off and the Arm Snap button is pressed swap position
-        if (!controller2.getToggle(robot.getControl("ArmControl")) && controller2.getOnPress(robot.getControl("ArmSnap"))) {
-            arm.setTargetPosition(direction ? armLowPoint: armHighPoint);
-            direction = !direction;
+        // Change Arm offset When Right bumper pressed
+        if (controller2.getOnPress(robot.getControl("ArmReset"))) {
+            offset = arm.getCurrentPosition();
         }
+
         // Upon claw toggle, alternate left and right claw power
-        leftServo.setPower(controller2.getToggle(robot.getControl("Claw")) ? -0.5: 0.5);
-        rightServo.setPower(controller2.getToggle(robot.getControl("Claw")) ? 0.5: -0.5);
+        leftServo.setPower(controller.getToggle(robot.getControl("Claw")) ? -0.5: 0.5);
+        rightServo.setPower(controller.getToggle(robot.getControl("Claw")) ? 0.5: -0.5);
 
         // Set odometry power to the left stick cubed, to add mild curving
         odometry.setPower(Math.pow(controller2.getFloat(robot.getControl("Odometry")), 3));
+        log.add(String.valueOf(arm.getCurrentPosition()));
+        log.clear();
 
         // Main drive method
-        robot.updateDrive(controller, controller2, true, false, 1d, OptimizedRobot.RobotDirection.FRONT, OptimizedRobot.RobotDirection.FRONT, false);
+        robot.updateDrive(controller, controller2, true, false, 0.7d, OptimizedRobot.RobotDirection.FRONT, OptimizedRobot.RobotDirection.FRONT, false);
     }
 }

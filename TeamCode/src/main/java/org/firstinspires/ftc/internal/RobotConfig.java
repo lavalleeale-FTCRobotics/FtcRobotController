@@ -42,5 +42,5 @@ public class RobotConfig {
     public static final OptimizedController.Key NUCLEAR_KEY = OptimizedController.Key.RIGHT_BUMPER;
 
     // 2022 Freight Frenzy Maximum Duck Spinner Speed
-    public static final double SPINNER_SPEED = -0.6;
+    public static final double SPINNER_SPEED = -0.4;
 }

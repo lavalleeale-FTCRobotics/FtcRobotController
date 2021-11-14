@@ -365,7 +365,7 @@ public class OptimizedRobot {
      */
     @Experimental
     public void updateDrive(OptimizedController controller1, OptimizedController controller2, boolean useController1, boolean useController2, double defaultSpeedFactor, RobotDirection controller1Dir, RobotDirection controller2Dir, boolean controller2CanOverride) {
-        updateDrive(controller1, controller2, useController1, useController2, defaultSpeedFactor, 5d, 2d, controller1Dir, controller2Dir, controller2CanOverride);
+        updateDrive(controller1, controller2, useController1, useController2, defaultSpeedFactor, 0.7, 5d, controller1Dir, controller2Dir, controller2CanOverride);
     }
 
     /**
@@ -408,8 +408,15 @@ public class OptimizedRobot {
             direction = controller2Dir;
         }
 
-        x = controller.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-        y = controller.getFloat(OptimizedController.Key.LEFT_STICK_Y);
+        double getX = controller.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
+        double getY = controller.getFloat(OptimizedController.Key.LEFT_STICK_Y);
+        if(!controller.getBool(OptimizedController.Key.DPAD_DOWN) && !controller.getBool(OptimizedController.Key.DPAD_UP) && !controller.getBool(OptimizedController.Key.DPAD_RIGHT) && !controller.getBool(OptimizedController.Key.DPAD_LEFT)) {
+            x = (Math.abs(getX) < 0.1 && Math.abs(getY) > 0.6) ? 0 : getX;
+            y = (Math.abs(getY) < 0.1 && Math.abs(getX) > 0.6) ? 0 : getY;
+        } else {
+            x = (controller.getBool(OptimizedController.Key.DPAD_LEFT)) ? -1 : ((controller.getBool(OptimizedController.Key.DPAD_RIGHT)) ? 1 : 0);
+            y = (controller.getBool(OptimizedController.Key.DPAD_DOWN)) ? -1 : ((controller.getBool(OptimizedController.Key.DPAD_UP)) ? 1 : 0);
+        }
         rx = controller.getFloat(OptimizedController.Key.RIGHT_STICK_X);
 
         if (direction == RobotDirection.FRONT) {

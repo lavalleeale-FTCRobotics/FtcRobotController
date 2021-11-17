@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.finals;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
 
 @Autonomous(name = "Simple Auto")
 public class SimpleAuto extends LinearOpMode {
@@ -24,7 +23,7 @@ public class SimpleAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping());
+        robot = new OptimizedRobot(telemetry, hardwareMap);
 
         log = telemetry.log();
 

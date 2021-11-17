@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.internal;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -53,6 +57,14 @@ public class OptimizedRobot {
     private final Telemetry telemetry;
 
     /**
+     * Stores the {@link OptimizedController}
+     * Used for robot.getControl
+     */
+    private OptimizedController controller1 = null;
+
+    private OptimizedController controller2 = null;
+
+    /**
      * Stores an instance of our OpenCV Loader, which should never need to be edited unless for version changes
      */
     private OpenCVLoader loader = null;
@@ -82,7 +94,7 @@ public class OptimizedRobot {
      * This holds a custom set of controls for Teleop to use
      */
     @Experimental
-    private HashMap<String, OptimizedController.Key> controlMap = null;
+    private HashMap<String, ControllerMapping.ControlInput> controlMap = null;
 
     /**
      * Stores the current robot status
@@ -153,16 +165,20 @@ public class OptimizedRobot {
     /**
      * Constructor of this class
      *
+     * @param controller1     The first {@link OptimizedController} instance for teleop
+     * @param controller2     The second {@link OptimizedController} instance for teleop
      * @param telemetry       The telemetry var inherited from OpMode/LinearOpMode
      * @param hardwareMap     The hardwareMap var inherited from OpMode/LinearOpMode
      * @param controlMap      A hashmap of string names to keys for teleop -- might be useless, idk
      */
-    public OptimizedRobot(Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap) {
+    public OptimizedRobot(OptimizedController controller1, OptimizedController controller2, Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap) {
         functions = new OptimizedDriveFunctions(this);
         this.controlMap = controlMap.initializeMapping(new HashMap<>());
 
         internalMap = hardwareMap;
         this.telemetry = telemetry;
+        this.controller1 = controller1;
+        this.controller2 = controller2;
 
         status = RobotStatus.READY;
     }
@@ -282,11 +298,37 @@ public class OptimizedRobot {
      * Used to grab our automated controls
      *
      * @param controlName The name of the control specified in your mapping
-     * @return The key associated with the control
+     * @return The boolean value associated with the control
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Experimental
-    public OptimizedController.Key getControl(String controlName) {
-        return controlMap.get(controlName);
+    public boolean getControl(String controlName) {
+        ControllerMapping.ControlInput input = controlMap.get(controlName);
+        OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
+        switch (input.type) {
+            case BOOL: return controller.getBool(input.key);
+            case PRESS: return controller.getOnPress(input.key);
+            case TOGGLE: return controller.getToggle(input.key);
+            case RELEASE: return controller.getOnRelease(input.key);
+        }
+        return false;
+    }
+
+    /**
+     * Used to grab our automated controls
+     *
+     * @param controlName The name of the control specified in your mapping
+     * @return The double value associated with the control
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Experimental
+    public double getControlFloat(String controlName) {
+        ControllerMapping.ControlInput input = controlMap.get(controlName);
+        OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
+        if (input.type == ControllerMapping.Type.FLOAT) {
+            return controller.getFloat(input.key);
+        }
+        return 0;
     }
 
     /**

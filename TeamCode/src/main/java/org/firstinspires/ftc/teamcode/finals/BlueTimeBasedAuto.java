@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.finals;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,7 +9,6 @@ import org.firstinspires.ftc.internal.OptimizedDriveFunctions;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.internal.RobotConfig;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
 
 @Autonomous(name = "Time Based Auto (Blue)")
 public class BlueTimeBasedAuto extends LinearOpMode {
@@ -24,7 +23,7 @@ public class BlueTimeBasedAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new OptimizedRobot(telemetry, hardwareMap, new SampleControllerMapping());
+        robot = new OptimizedRobot(telemetry, hardwareMap);
         controller1 = new OptimizedController(gamepad1);
         controller2 = new OptimizedController(gamepad2);
 

@@ -127,11 +127,12 @@ public class OptimizedDriveFunctions {
      * @param motor      The motor to use
      * @param controller The controller to use
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateTwoWayMotorController(String inControl, String outControl, DcMotor motor, OptimizedController controller) {
-        if (controller.getFloat(robot.getControl(inControl)) > 0) {
-            motor.setPower(controller.getFloat(robot.getControl(inControl)));
+        if (robot.getControlFloat(inControl) > 0) {
+            motor.setPower(robot.getControlFloat(inControl));
         } else {
-            motor.setPower(-controller.getFloat(robot.getControl(outControl)));
+            motor.setPower(-robot.getControlFloat(outControl));
         }
     }
 
@@ -143,14 +144,15 @@ public class OptimizedDriveFunctions {
      * @param motors     The motors to use
      * @param controller The controller to use
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateTwoWayMotorController(String inControl, String outControl, List<DcMotor> motors, OptimizedController controller) {
-        if (controller.getFloat(robot.getControl(inControl)) > 0) {
+        if (robot.getControlFloat(inControl) > 0) {
             for (DcMotor motor : motors) {
-                motor.setPower(controller.getFloat(robot.getControl(inControl)));
+                motor.setPower(robot.getControlFloat(inControl));
             }
         } else {
             for (DcMotor motor : motors) {
-                motor.setPower(-controller.getFloat(robot.getControl(outControl)));
+                motor.setPower(-robot.getControlFloat(outControl));
             }
         }
     }
@@ -184,14 +186,15 @@ public class OptimizedDriveFunctions {
      * @param controller  The controller to use
      * @param maxVelocity The maximum velocity to use
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateTwoWayMotorControllerVelocity(String inControl, String outControl, List<DcMotorEx> motors, OptimizedController controller, double maxVelocity) {
-        if (controller.getFloat(robot.getControl(inControl)) > 0) {
+        if (robot.getControlFloat(inControl) > 0) {
             for (DcMotorEx motor : motors) {
-                motor.setVelocity(controller.getFloat(robot.getControl(inControl)) * maxVelocity);
+                motor.setVelocity(robot.getControlFloat(inControl) * maxVelocity);
             }
         } else {
             for (DcMotorEx motor : motors) {
-                motor.setVelocity(-controller.getFloat(robot.getControl(outControl)) * maxVelocity);
+                motor.setVelocity(-robot.getControlFloat(outControl) * maxVelocity);
             }
         }
     }
@@ -243,11 +246,12 @@ public class OptimizedDriveFunctions {
      * @param controller  The controller to use
      * @param maxVelocity The maximum velocity to use
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateTwoWayMotorControllerVelocity(String inControl, String outControl, DcMotorEx motor, OptimizedController controller, double maxVelocity) {
-        if (controller.getFloat(robot.getControl(inControl)) > 0) {
-            motor.setVelocity(controller.getFloat(robot.getControl(inControl)) * maxVelocity);
+        if (robot.getControlFloat(inControl) > 0) {
+            motor.setVelocity(robot.getControlFloat(inControl) * maxVelocity);
         } else {
-            motor.setVelocity(controller.getFloat(robot.getControl(outControl)) * maxVelocity);
+            motor.setVelocity(robot.getControlFloat(outControl) * maxVelocity);
         }
     }
 
@@ -261,14 +265,15 @@ public class OptimizedDriveFunctions {
      * @param maxVelocity  The maximum velocity to use
      * @param velocityUnit The units to use for velocity
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateTwoWayMotorControllerVelocity(String inControl, String outControl, List<DcMotorEx> motors, OptimizedController controller, double maxVelocity, AngleUnit velocityUnit) {
-        if (controller.getFloat(robot.getControl(inControl)) > 0) {
+        if (robot.getControlFloat(inControl) > 0) {
             for (DcMotorEx motor : motors) {
-                motor.setVelocity(controller.getFloat(robot.getControl(inControl)) * maxVelocity, velocityUnit);
+                motor.setVelocity(robot.getControlFloat(inControl) * maxVelocity, velocityUnit);
             }
         } else {
             for (DcMotorEx motor : motors) {
-                motor.setVelocity(-controller.getFloat(robot.getControl(outControl)) * maxVelocity, velocityUnit);
+                motor.setVelocity(-robot.getControlFloat(outControl) * maxVelocity, velocityUnit);
             }
         }
     }
@@ -323,11 +328,12 @@ public class OptimizedDriveFunctions {
      * @param maxVelocity  The maximum velocity to use
      * @param velocityUnit The units to use for velocity
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateTwoWayMotorControllerVelocity(String inControl, String outControl, DcMotorEx motor, OptimizedController controller, double maxVelocity, AngleUnit velocityUnit) {
-        if (controller.getFloat(robot.getControl(inControl)) > 0) {
-            motor.setVelocity(controller.getFloat(robot.getControl(inControl)) * maxVelocity, velocityUnit);
+        if (robot.getControlFloat(inControl) > 0) {
+            motor.setVelocity(robot.getControlFloat(inControl) * maxVelocity, velocityUnit);
         } else {
-            motor.setVelocity(controller.getFloat(robot.getControl(outControl)) * maxVelocity, velocityUnit);
+            motor.setVelocity(robot.getControlFloat(outControl) * maxVelocity, velocityUnit);
         }
     }
 

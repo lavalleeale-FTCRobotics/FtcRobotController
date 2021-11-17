@@ -38,10 +38,10 @@ public class OptimizedController {
     /**
      * Constructor
      *
-     * @param requiredGamepad If assigned a value, on that gamepad can use this controller -- null if you want this to be optional
+     * @param gamepad If assigned a value, on that gamepad can use this controller -- null if you want this to be optional
      */
-    public OptimizedController(Gamepad requiredGamepad) {
-        this.internalGamepad = requiredGamepad;
+    public OptimizedController(Gamepad gamepad) {
+        this.internalGamepad = gamepad;
         for (Key key : Key.values()) {
             canToggleList.put(key, true);
         }

@@ -417,8 +417,8 @@ public class OptimizedRobot {
         // Our input vars
         double x, y, rx;
 
-        x = -gamepad1.left_stick_x * strafingCo;
-        y = gamepad1.left_stick_y;
+        x = gamepad1.left_stick_x * strafingCo;
+        y = -gamepad1.left_stick_y;
         rx = gamepad1.right_stick_x;
 
         // Power variables

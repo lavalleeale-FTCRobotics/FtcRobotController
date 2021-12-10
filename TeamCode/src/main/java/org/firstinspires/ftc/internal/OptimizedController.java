@@ -38,10 +38,10 @@ public class OptimizedController {
     /**
      * Constructor
      *
-     * @param requiredGamepad If assigned a value, on that gamepad can use this controller -- null if you want this to be optional
+     * @param gamepad If assigned a value, on that gamepad can use this controller -- null if you want this to be optional
      */
-    public OptimizedController(Gamepad requiredGamepad) {
-        this.internalGamepad = requiredGamepad;
+    public OptimizedController(Gamepad gamepad) {
+        this.internalGamepad = gamepad;
         for (Key key : Key.values()) {
             canToggleList.put(key, true);
         }
@@ -57,7 +57,7 @@ public class OptimizedController {
      * The keys on the controller
      */
     public enum Key {
-        START, A, B, X, Y, LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER, LEFT_STICK_X, LEFT_STICK_Y, RIGHT_STICK_X, RIGHT_STICK_Y, DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT, BACK
+        START, A, B, X, Y, LEFT_BUMPER, RIGHT_BUMPER, LEFT_TRIGGER, RIGHT_TRIGGER, LEFT_STICK_X, LEFT_STICK_Y, LEFT_STICK_BUTTON, RIGHT_STICK_X, RIGHT_STICK_Y, RIGHT_STICK_BUTTON, DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT, BACK
     }
 
     /**
@@ -167,10 +167,14 @@ public class OptimizedController {
                 return !NumberFunctions.isZero(internalGamepad.left_stick_x);
             case LEFT_STICK_Y:
                 return !NumberFunctions.isZero(internalGamepad.left_stick_y);
+            case LEFT_STICK_BUTTON:
+                return internalGamepad.left_stick_button;
             case RIGHT_STICK_X:
                 return !NumberFunctions.isZero(internalGamepad.right_stick_x);
             case RIGHT_STICK_Y:
                 return !NumberFunctions.isZero(internalGamepad.right_stick_y);
+            case RIGHT_STICK_BUTTON:
+                return internalGamepad.right_stick_button;
             case LEFT_TRIGGER:
                 return !NumberFunctions.isZero(internalGamepad.left_trigger);
             case RIGHT_TRIGGER:

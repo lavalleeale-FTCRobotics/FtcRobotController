@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.internal;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -53,6 +57,14 @@ public class OptimizedRobot {
     private final Telemetry telemetry;
 
     /**
+     * Stores the {@link OptimizedController}
+     * Used for robot.getControl
+     */
+    private OptimizedController controller1 = null;
+
+    private OptimizedController controller2 = null;
+
+    /**
      * Stores an instance of our OpenCV Loader, which should never need to be edited unless for version changes
      */
     private OpenCVLoader loader = null;
@@ -82,7 +94,7 @@ public class OptimizedRobot {
      * This holds a custom set of controls for Teleop to use
      */
     @Experimental
-    private HashMap<String, OptimizedController.Key> controlMap = null;
+    private HashMap<String, ControllerMapping.ControlInput> controlMap = null;
 
     /**
      * Stores the current robot status
@@ -153,16 +165,20 @@ public class OptimizedRobot {
     /**
      * Constructor of this class
      *
+     * @param controller1     The first {@link OptimizedController} instance for teleop
+     * @param controller2     The second {@link OptimizedController} instance for teleop
      * @param telemetry       The telemetry var inherited from OpMode/LinearOpMode
      * @param hardwareMap     The hardwareMap var inherited from OpMode/LinearOpMode
      * @param controlMap      A hashmap of string names to keys for teleop -- might be useless, idk
      */
-    public OptimizedRobot(Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap) {
+    public OptimizedRobot(OptimizedController controller1, OptimizedController controller2, Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap) {
         functions = new OptimizedDriveFunctions(this);
         this.controlMap = controlMap.initializeMapping(new HashMap<>());
 
         internalMap = hardwareMap;
         this.telemetry = telemetry;
+        this.controller1 = controller1;
+        this.controller2 = controller2;
 
         status = RobotStatus.READY;
     }
@@ -282,11 +298,51 @@ public class OptimizedRobot {
      * Used to grab our automated controls
      *
      * @param controlName The name of the control specified in your mapping
-     * @return The key associated with the control
+     * @return The boolean value associated with the control
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Experimental
-    public OptimizedController.Key getControl(String controlName) {
-        return controlMap.get(controlName);
+    public boolean getControl(String controlName) {
+        ControllerMapping.ControlInput input = controlMap.get(controlName);
+        if (input.controller != ControllerMapping.Controller.BOTH) {
+            OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
+            switch (input.type) {
+                case BOOL: return controller.getBool(input.key);
+                case PRESS: return controller.getOnPress(input.key);
+                case TOGGLE: return controller.getToggle(input.key);
+                case RELEASE: return controller.getOnRelease(input.key);
+            }
+        } else {
+            switch (input.type) {
+                case BOOL: return controller1.getBool(input.key) || controller2.getBool(input.key);
+                case PRESS: return controller1.getOnPress(input.key) || controller2.getOnPress(input.key);
+                case TOGGLE: return controller1.getToggle(input.key) ^ controller2.getToggle(input.key);
+                case RELEASE: return controller1.getOnRelease(input.key) || controller2.getOnRelease(input.key);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Used to grab our automated controls
+     *
+     * @param controlName The name of the control specified in your mapping
+     * @return The double value associated with the control
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Experimental
+    public double getControlFloat(String controlName) {
+        ControllerMapping.ControlInput input = controlMap.get(controlName);
+
+        if (input.controller != ControllerMapping.Controller.BOTH) {
+            OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
+            if (input.type == ControllerMapping.Type.FLOAT) {
+                return controller.getFloat(input.key);
+            }
+        } else {
+            return Math.abs(controller1.getFloat(input.key)) > Math.abs(controller2.getFloat(input.key)) ? controller1.getFloat(input.key) : controller2.getFloat(input.key);
+        }
+        return 0;
     }
 
     /**
@@ -365,7 +421,7 @@ public class OptimizedRobot {
      */
     @Experimental
     public void updateDrive(OptimizedController controller1, OptimizedController controller2, boolean useController1, boolean useController2, double defaultSpeedFactor, RobotDirection controller1Dir, RobotDirection controller2Dir, boolean controller2CanOverride) {
-        updateDrive(controller1, controller2, useController1, useController2, defaultSpeedFactor, 5d, 2d, controller1Dir, controller2Dir, controller2CanOverride);
+        updateDrive(controller1, controller2, useController1, useController2, defaultSpeedFactor, 0.7, 5d, controller1Dir, controller2Dir, controller2CanOverride);
     }
 
     /**
@@ -408,8 +464,15 @@ public class OptimizedRobot {
             direction = controller2Dir;
         }
 
-        x = controller.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-        y = controller.getFloat(OptimizedController.Key.LEFT_STICK_Y);
+        double getX = controller.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
+        double getY = controller.getFloat(OptimizedController.Key.LEFT_STICK_Y);
+        if(!controller.getBool(OptimizedController.Key.DPAD_DOWN) && !controller.getBool(OptimizedController.Key.DPAD_UP) && !controller.getBool(OptimizedController.Key.DPAD_RIGHT) && !controller.getBool(OptimizedController.Key.DPAD_LEFT)) {
+            x = (Math.abs(getX) < 0.1 && Math.abs(getY) > 0.6) ? 0 : getX;
+            y = (Math.abs(getY) < 0.1 && Math.abs(getX) > 0.6) ? 0 : getY;
+        } else {
+            x = (controller.getBool(OptimizedController.Key.DPAD_LEFT)) ? -1 : ((controller.getBool(OptimizedController.Key.DPAD_RIGHT)) ? 1 : 0);
+            y = (controller.getBool(OptimizedController.Key.DPAD_DOWN)) ? -1 : ((controller.getBool(OptimizedController.Key.DPAD_UP)) ? 1 : 0);
+        }
         rx = controller.getFloat(OptimizedController.Key.RIGHT_STICK_X);
 
         if (direction == RobotDirection.FRONT) {

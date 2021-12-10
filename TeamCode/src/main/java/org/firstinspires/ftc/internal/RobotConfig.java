@@ -41,5 +41,9 @@ public class RobotConfig {
     // Used in 2021 Ultimate Goal for Louis to be able to override driver 1 if held down
     public static final OptimizedController.Key NUCLEAR_KEY = OptimizedController.Key.RIGHT_BUMPER;
 
+    // 2022 Freight Frenzy Maximum Duck Spinner Speed
+    public static final double SPINNER_SPEED = -0.4;
 
+    // 2022 Freight Frenzy Run To Position Arm Power
+    public static final double ARM_POWER = 1.0;
 }

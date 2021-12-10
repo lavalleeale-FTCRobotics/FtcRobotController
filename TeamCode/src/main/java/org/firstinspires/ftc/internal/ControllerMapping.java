@@ -5,13 +5,12 @@ import java.util.HashMap;
 
 /**
  * Holds a mapping on the controller with all the buttons and floats
- * @author Owen
- * @author Alex
+ * @author Owen and Alex
  */
 public interface ControllerMapping {
 
     enum Controller {
-        CONTROLLER1, CONTROLLER2
+        CONTROLLER1, CONTROLLER2, BOTH
     }
     enum Type {
         TOGGLE, PRESS, RELEASE, BOOL, FLOAT

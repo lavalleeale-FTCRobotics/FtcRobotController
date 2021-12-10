@@ -304,12 +304,21 @@ public class OptimizedRobot {
     @Experimental
     public boolean getControl(String controlName) {
         ControllerMapping.ControlInput input = controlMap.get(controlName);
-        OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
-        switch (input.type) {
-            case BOOL: return controller.getBool(input.key);
-            case PRESS: return controller.getOnPress(input.key);
-            case TOGGLE: return controller.getToggle(input.key);
-            case RELEASE: return controller.getOnRelease(input.key);
+        if (input.controller != ControllerMapping.Controller.BOTH) {
+            OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
+            switch (input.type) {
+                case BOOL: return controller.getBool(input.key);
+                case PRESS: return controller.getOnPress(input.key);
+                case TOGGLE: return controller.getToggle(input.key);
+                case RELEASE: return controller.getOnRelease(input.key);
+            }
+        } else {
+            switch (input.type) {
+                case BOOL: return controller1.getBool(input.key) || controller2.getBool(input.key);
+                case PRESS: return controller1.getOnPress(input.key) || controller2.getOnPress(input.key);
+                case TOGGLE: return controller1.getToggle(input.key) ^ controller2.getToggle(input.key);
+                case RELEASE: return controller1.getOnRelease(input.key) || controller2.getOnRelease(input.key);
+            }
         }
         return false;
     }
@@ -324,9 +333,14 @@ public class OptimizedRobot {
     @Experimental
     public double getControlFloat(String controlName) {
         ControllerMapping.ControlInput input = controlMap.get(controlName);
-        OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
-        if (input.type == ControllerMapping.Type.FLOAT) {
-            return controller.getFloat(input.key);
+
+        if (input.controller != ControllerMapping.Controller.BOTH) {
+            OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
+            if (input.type == ControllerMapping.Type.FLOAT) {
+                return controller.getFloat(input.key);
+            }
+        } else {
+            return Math.abs(controller1.getFloat(input.key)) > Math.abs(controller2.getFloat(input.key)) ? controller1.getFloat(input.key) : controller2.getFloat(input.key);
         }
         return 0;
     }

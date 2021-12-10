@@ -28,6 +28,7 @@ public class ExampleTeleOp extends OpMode {
         controller1 = new OptimizedController(gamepad1);
         controller2 = new OptimizedController(gamepad2);
 
+
         log = telemetry.log();
 
         robot = new OptimizedRobot(controller1, controller2, telemetry, hardwareMap, new ExampleControllerMapping());

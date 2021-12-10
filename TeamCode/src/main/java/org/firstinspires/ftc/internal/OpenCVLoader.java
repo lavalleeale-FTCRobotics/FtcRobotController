@@ -7,9 +7,10 @@ import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 public class OpenCVLoader {
-    private OpenCvCamera phoneCam;
+    private OpenCvWebcam phoneCam;
     public OptimizedOpenCVPipeline pipeline;
     private final HardwareMap map;
     private final Point translation = null;
@@ -31,9 +32,18 @@ public class OpenCVLoader {
             phoneCam = OpenCvCameraFactory.getInstance().createWebcam(map.get(WebcamName.class, RobotConfig.WEBCAM_NAME));
         }
 
-
         phoneCam.setPipeline(pipeline);
+        phoneCam.setMillisecondsPermissionTimeout(2500);
 
-        phoneCam.openCameraDeviceAsync(() -> phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT));
+        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int i) {
+            }
+        });
     }
 }

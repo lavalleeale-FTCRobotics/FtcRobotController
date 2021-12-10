@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.internal;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -8,7 +12,6 @@ import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -17,7 +20,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.internal.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,16 +41,6 @@ public class OptimizedRobot {
     }
 
     /**
-     * Our internal gampads
-     */
-    private final Gamepad gamepad1, gamepad2;
-
-    /**
-     * The virtual controllers
-     */
-    private final List<OptimizedController> controllers = new ArrayList<>();
-
-    /**
      * The current drive mode of the robot. More info below here: {@link #getDriveMode()}
      */
     private DriveMode driveMode = DriveMode.STOPPED;
@@ -63,6 +55,14 @@ public class OptimizedRobot {
      * Used for outputting data to the drive station console.
      */
     private final Telemetry telemetry;
+
+    /**
+     * Stores the {@link OptimizedController}
+     * Used for robot.getControl
+     */
+    private OptimizedController controller1 = null;
+
+    private OptimizedController controller2 = null;
 
     /**
      * Stores an instance of our OpenCV Loader, which should never need to be edited unless for version changes
@@ -94,7 +94,7 @@ public class OptimizedRobot {
      * This holds a custom set of controls for Teleop to use
      */
     @Experimental
-    private HashMap<String, OptimizedController.Key> controlMap = null;
+    private HashMap<String, ControllerMapping.ControlInput> controlMap = null;
 
     /**
      * Stores the current robot status
@@ -150,57 +150,11 @@ public class OptimizedRobot {
     /**
      * Constructor oi this class
      *
-     * @param gamepad1    The gamepad1 var inherited from OpMode/LinearOpMode
-     * @param gamepad2    The gamepad2 var inherited from OpMode/LinearOpMode
-     * @param telemetry   The telemetry var inherited from OpMode/LinearOpMode
-     * @param hardwareMap The hardwareMap var inherited from OpMode/LinearOpMode
-     */
-    public OptimizedRobot(Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry, HardwareMap hardwareMap) {
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
-        functions = new OptimizedDriveFunctions(this);
-
-        internalMap = hardwareMap;
-        this.telemetry = telemetry;
-
-        status = RobotStatus.READY;
-    }
-
-    /**
-     * Constructor oi this class
-     *
-     * @param gamepad1    The gamepad1 var inherited from OpMode/LinearOpMode
-     * @param gamepad2    The gamepad2 var inherited from OpMode/LinearOpMode
-     * @param telemetry   The telemetry var inherited from OpMode/LinearOpMode
-     * @param hardwareMap The hardwareMap var inherited from OpMode/LinearOpMode
-     * @param controlMap  A hashmap of string names to keys for teleop -- might be useless, idk
-     */
-    public OptimizedRobot(Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap) {
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
-        functions = new OptimizedDriveFunctions(this);
-        this.controlMap = controlMap.initializeMapping(new HashMap<>());
-
-        internalMap = hardwareMap;
-        this.telemetry = telemetry;
-
-        status = RobotStatus.READY;
-    }
-
-    /**
-     * Constructor oi this class
-     *
-     * @param gamepad1        The gamepad1 var inherited from OpMode/LinearOpMode
-     * @param gamepad2        The gamepad2 var inherited from OpMode/LinearOpMode
      * @param telemetry       The telemetry var inherited from OpMode/LinearOpMode
      * @param hardwareMap     The hardwareMap var inherited from OpMode/LinearOpMode
-     * @param hardwareMapping A hashmap of hardware map names to aliases for use in op modes (to avoid to confusion)
      */
-    public OptimizedRobot(Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry, HardwareMap hardwareMap, HardwareAliasMapping hardwareMapping) {
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
+    public OptimizedRobot(Telemetry telemetry, HardwareMap hardwareMap) {
         functions = new OptimizedDriveFunctions(this);
-        this.aliasMap = hardwareMapping.initializeMapping(new HashMap<>());
 
         internalMap = hardwareMap;
         this.telemetry = telemetry;
@@ -209,24 +163,22 @@ public class OptimizedRobot {
     }
 
     /**
-     * Constructor oi this class
+     * Constructor of this class
      *
-     * @param gamepad1        The gamepad1 var inherited from OpMode/LinearOpMode
-     * @param gamepad2        The gamepad2 var inherited from OpMode/LinearOpMode
+     * @param controller1     The first {@link OptimizedController} instance for teleop
+     * @param controller2     The second {@link OptimizedController} instance for teleop
      * @param telemetry       The telemetry var inherited from OpMode/LinearOpMode
      * @param hardwareMap     The hardwareMap var inherited from OpMode/LinearOpMode
      * @param controlMap      A hashmap of string names to keys for teleop -- might be useless, idk
-     * @param hardwareMapping A hashmap of hardware map names to aliases for use in op modes (to avoid to confusion)
      */
-    public OptimizedRobot(Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap, HardwareAliasMapping hardwareMapping) {
-        this.gamepad1 = gamepad1;
-        this.gamepad2 = gamepad2;
+    public OptimizedRobot(OptimizedController controller1, OptimizedController controller2, Telemetry telemetry, HardwareMap hardwareMap, ControllerMapping controlMap) {
         functions = new OptimizedDriveFunctions(this);
         this.controlMap = controlMap.initializeMapping(new HashMap<>());
-        this.aliasMap = hardwareMapping.initializeMapping(new HashMap<>());
 
         internalMap = hardwareMap;
         this.telemetry = telemetry;
+        this.controller1 = controller1;
+        this.controller2 = controller2;
 
         status = RobotStatus.READY;
     }
@@ -346,11 +298,51 @@ public class OptimizedRobot {
      * Used to grab our automated controls
      *
      * @param controlName The name of the control specified in your mapping
-     * @return The key associated with the control
+     * @return The boolean value associated with the control
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Experimental
-    public OptimizedController.Key getControl(String controlName) {
-        return controlMap.get(controlName);
+    public boolean getControl(String controlName) {
+        ControllerMapping.ControlInput input = controlMap.get(controlName);
+        if (input.controller != ControllerMapping.Controller.BOTH) {
+            OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
+            switch (input.type) {
+                case BOOL: return controller.getBool(input.key);
+                case PRESS: return controller.getOnPress(input.key);
+                case TOGGLE: return controller.getToggle(input.key);
+                case RELEASE: return controller.getOnRelease(input.key);
+            }
+        } else {
+            switch (input.type) {
+                case BOOL: return controller1.getBool(input.key) || controller2.getBool(input.key);
+                case PRESS: return controller1.getOnPress(input.key) || controller2.getOnPress(input.key);
+                case TOGGLE: return controller1.getToggle(input.key) ^ controller2.getToggle(input.key);
+                case RELEASE: return controller1.getOnRelease(input.key) || controller2.getOnRelease(input.key);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Used to grab our automated controls
+     *
+     * @param controlName The name of the control specified in your mapping
+     * @return The double value associated with the control
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Experimental
+    public double getControlFloat(String controlName) {
+        ControllerMapping.ControlInput input = controlMap.get(controlName);
+
+        if (input.controller != ControllerMapping.Controller.BOTH) {
+            OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
+            if (input.type == ControllerMapping.Type.FLOAT) {
+                return controller.getFloat(input.key);
+            }
+        } else {
+            return Math.abs(controller1.getFloat(input.key)) > Math.abs(controller2.getFloat(input.key)) ? controller1.getFloat(input.key) : controller2.getFloat(input.key);
+        }
+        return 0;
     }
 
     /**
@@ -399,74 +391,8 @@ public class OptimizedRobot {
      * @usage Only call this method after initialization and instantiating the robot
      * This algorithm makes gamepad 1 have standard forward controls over the robot!
      */
-    public void updateDrive(double defaultSpeedFactor) {
-
-        // If the OpMode didn't specifically initialize motors with settings, call the default one
-        if (!hasUpdatedDrive && !hasInitializedMotors)
-            initializeDriveMotors();
-        hasUpdatedDrive = true;
-
-
-        // Set drive state
-        status = RobotStatus.DRIVING;
-
-        // This is tuned to counteract imperfect strafing
-        double strafingCo = 1.5;
-
-
-        // Our input vars
-        double x, y, rx;
-
-        x = gamepad1.left_stick_x * strafingCo;
-        y = -gamepad1.left_stick_y;
-        rx = gamepad1.right_stick_x;
-
-        // Power variables
-        double fl, fr, bl, br;
-
-        fl = y + x + rx;
-        bl = y - x + rx;
-        fr = y - x - rx;
-        br = y + x - rx;
-
-        // Making sure our speeds are in capped at -1, 1
-        if (Math.abs(fl) > 1 || Math.abs(bl) > 1 ||
-                Math.abs(fr) > 1 || Math.abs(fl) > 1) {
-            // Find the largest power
-            double max;
-            max = Math.max(Math.abs(fl), Math.abs(bl));
-            max = Math.max(Math.abs(fr), max);
-            max = Math.max(Math.abs(br), max);
-
-            // Divide everything by max (it's positive so we don't need to worry
-            // about signs)
-            fl /= max;
-            bl /= max;
-            fr /= max;
-            br /= max;
-        }
-
-        if (gamepad1.left_bumper && gamepad1.right_bumper) {
-            fl *= defaultSpeedFactor * (1 / 5.0);
-            fr *= defaultSpeedFactor * (1 / 5.0);
-            bl *= defaultSpeedFactor * (1 / 5.0);
-            br *= defaultSpeedFactor * (1 / 5.0);
-        } else if (gamepad1.left_bumper || gamepad1.right_bumper) {
-            fl *= defaultSpeedFactor * (1 / 2.0);
-            fr *= defaultSpeedFactor * (1 / 2.0);
-            bl *= defaultSpeedFactor * (1 / 2.0);
-            br *= defaultSpeedFactor * (1 / 2.0);
-        } else {
-            fl *= defaultSpeedFactor;
-            fr *= defaultSpeedFactor;
-            bl *= defaultSpeedFactor;
-            br *= defaultSpeedFactor;
-        }
-
-        motors[1].setPower(fr);
-        motors[0].setPower(fl);
-        motors[2].setPower(bl);
-        motors[3].setPower(br);
+    public void updateDrive(OptimizedController controller1, OptimizedController controller2, double defaultSpeedFactor) {
+        updateDrive(controller1, controller2, true, true, defaultSpeedFactor, 5d, 2d, RobotDirection.FRONT, RobotDirection.FRONT, false);
     }
 
     /**
@@ -478,74 +404,8 @@ public class OptimizedRobot {
      * @usage Only call this method after initialization and instantiating the robot
      * This algorithm makes gamepad 1 have standard forward controls over the robot!
      */
-    public void updateDrive(double defaultSpeedFactor, double precisionModeFactor, double slowmodeFactor) {
-
-        // If the OpMode didn't specifically initialize motors with settings, call the default one
-        if (!hasUpdatedDrive && !hasInitializedMotors)
-            initializeDriveMotors();
-        hasUpdatedDrive = true;
-
-
-        // Set drive state
-        status = RobotStatus.DRIVING;
-
-        // This is tuned to counteract imperfect strafing
-        double strafingCo = 1.5;
-
-
-        // Our input vars
-        double x, y, rx;
-
-        x = -gamepad1.left_stick_x * strafingCo;
-        y = gamepad1.left_stick_y;
-        rx = gamepad1.right_stick_x;
-
-        // Power variables
-        double fl, fr, bl, br;
-
-        fl = y + x + rx;
-        bl = y - x + rx;
-        fr = y - x - rx;
-        br = y + x - rx;
-
-        // Making sure our speeds are in capped at -1, 1
-        if (Math.abs(fl) > 1 || Math.abs(bl) > 1 ||
-                Math.abs(fr) > 1 || Math.abs(fl) > 1) {
-            // Find the largest power
-            double max;
-            max = Math.max(Math.abs(fl), Math.abs(bl));
-            max = Math.max(Math.abs(fr), max);
-            max = Math.max(Math.abs(br), max);
-
-            // Divide everything by max (it's positive so we don't need to worry
-            // about signs)
-            fl /= max;
-            bl /= max;
-            fr /= max;
-            br /= max;
-        }
-
-        if (gamepad1.left_bumper && gamepad1.right_bumper) {
-            fl *= defaultSpeedFactor * (1 / slowmodeFactor);
-            fr *= defaultSpeedFactor * (1 / slowmodeFactor);
-            bl *= defaultSpeedFactor * (1 / slowmodeFactor);
-            br *= defaultSpeedFactor * (1 / slowmodeFactor);
-        } else if (gamepad1.left_bumper || gamepad1.right_bumper) {
-            fl *= defaultSpeedFactor * (1 / precisionModeFactor);
-            fr *= defaultSpeedFactor * (1 / precisionModeFactor);
-            bl *= defaultSpeedFactor * (1 / precisionModeFactor);
-            br *= defaultSpeedFactor * (1 / precisionModeFactor);
-        } else {
-            fl *= defaultSpeedFactor;
-            fr *= defaultSpeedFactor;
-            bl *= defaultSpeedFactor;
-            br *= defaultSpeedFactor;
-        }
-
-        motors[1].setPower(fr);
-        motors[0].setPower(fl);
-        motors[2].setPower(bl);
-        motors[3].setPower(br);
+    public void updateDrive(OptimizedController controller1, OptimizedController controller2, double defaultSpeedFactor, double precisionModeFactor, double slowmodeFactor) {
+        updateDrive(controller1, controller2, true, true, defaultSpeedFactor, precisionModeFactor, slowmodeFactor, RobotDirection.FRONT, RobotDirection.FRONT, false);
     }
 
     /**
@@ -561,129 +421,7 @@ public class OptimizedRobot {
      */
     @Experimental
     public void updateDrive(OptimizedController controller1, OptimizedController controller2, boolean useController1, boolean useController2, double defaultSpeedFactor, RobotDirection controller1Dir, RobotDirection controller2Dir, boolean controller2CanOverride) {
-
-        // If the OpMode didn't specifically initialize motors with settings, call the default one
-        if (!hasUpdatedDrive && !hasInitializedMotors)
-            initializeDriveMotors();
-        hasUpdatedDrive = true;
-
-
-        // Set drive state
-        status = RobotStatus.DRIVING;
-
-        // This is tuned to counteract imperfect strafing
-        double strafingCo = 1.5;
-
-
-        // Our input vars
-        double x = 0, y = 0, rx = 0;
-
-        boolean usingController1 = false;
-
-        if (((!controller1.isBeingUsed() || !useController1) || (controller2.getBool(RobotConfig.NUCLEAR_KEY) && controller2CanOverride)) && useController2) {
-            if (controller2Dir == RobotDirection.FRONT) {
-                x = controller2.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-                y = -controller2.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-                rx = controller2.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else if (controller2Dir == RobotDirection.BACK) {
-                x = -controller2.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-                y = controller2.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-                rx = controller2.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else if (controller2Dir == RobotDirection.LEFT) {
-                x = controller2.getFloat(OptimizedController.Key.LEFT_STICK_Y) * strafingCo;
-                y = controller2.getFloat(OptimizedController.Key.LEFT_STICK_X);
-                rx = controller2.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else {
-                x = -controller2.getFloat(OptimizedController.Key.LEFT_STICK_Y) * strafingCo;
-                y = -controller2.getFloat(OptimizedController.Key.LEFT_STICK_X);
-                rx = controller2.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            }
-        } else if (useController1) {
-            usingController1 = true;
-            if (controller1Dir == RobotDirection.FRONT) {
-                x = controller1.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-                y = -controller1.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-                rx = controller1.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else if (controller1Dir == RobotDirection.BACK) {
-                x = -controller1.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-                y = controller1.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-                rx = controller1.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else if (controller1Dir == RobotDirection.LEFT) {
-                x = controller1.getFloat(OptimizedController.Key.LEFT_STICK_Y) * strafingCo;
-                y = controller1.getFloat(OptimizedController.Key.LEFT_STICK_X);
-                rx = controller1.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else {
-                x = -controller1.getFloat(OptimizedController.Key.LEFT_STICK_Y) * strafingCo;
-                y = -controller1.getFloat(OptimizedController.Key.LEFT_STICK_X);
-                rx = controller1.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            }
-        }
-
-        // Power variables
-        double fl, fr, bl, br;
-
-        fl = y + x + rx;
-        bl = y - x + rx;
-        fr = y - x - rx;
-        br = y + x - rx;
-
-        // Making sure our speeds are in capped at -1, 1
-        if (Math.abs(fl) > 1 || Math.abs(bl) > 1 ||
-                Math.abs(fr) > 1 || Math.abs(fl) > 1) {
-            // Find the largest power
-            double max;
-            max = Math.max(Math.abs(fl), Math.abs(bl));
-            max = Math.max(Math.abs(fr), max);
-            max = Math.max(Math.abs(br), max);
-
-            // Divide everything by max (it's positive so we don't need to worry
-            // about signs)
-            fl /= max;
-            bl /= max;
-            fr /= max;
-            br /= max;
-        }
-
-        if (usingController1) {
-            if (controller1.getBool(OptimizedController.Key.LEFT_BUMPER) && controller1.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
-                fl *= defaultSpeedFactor * (1 / 5.0);
-                fr *= defaultSpeedFactor * (1 / 5.0);
-                bl *= defaultSpeedFactor * (1 / 5.0);
-                br *= defaultSpeedFactor * (1 / 5.0);
-            } else if (controller1.getBool(OptimizedController.Key.LEFT_BUMPER) || controller1.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
-                fl *= defaultSpeedFactor * (1 / 2.0);
-                fr *= defaultSpeedFactor * (1 / 2.0);
-                bl *= defaultSpeedFactor * (1 / 2.0);
-                br *= defaultSpeedFactor * (1 / 2.0);
-            } else {
-                fl *= defaultSpeedFactor;
-                fr *= defaultSpeedFactor;
-                bl *= defaultSpeedFactor;
-                br *= defaultSpeedFactor;
-            }
-        } else {
-            if (controller2.getBool(OptimizedController.Key.LEFT_BUMPER) && controller2.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
-                fl *= defaultSpeedFactor * (1 / 5.0);
-                fr *= defaultSpeedFactor * (1 / 5.0);
-                bl *= defaultSpeedFactor * (1 / 5.0);
-                br *= defaultSpeedFactor * (1 / 5.0);
-            } else if (controller2.getBool(OptimizedController.Key.LEFT_BUMPER) || controller2.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
-                fl *= defaultSpeedFactor * (1 / 2.0);
-                fr *= defaultSpeedFactor * (1 / 2.0);
-                bl *= defaultSpeedFactor * (1 / 2.0);
-                br *= defaultSpeedFactor * (1 / 2.0);
-            } else {
-                fl *= defaultSpeedFactor;
-                fr *= defaultSpeedFactor;
-                bl *= defaultSpeedFactor;
-                br *= defaultSpeedFactor;
-            }
-        }
-
-        motors[1].setPower(fr);
-        motors[0].setPower(fl);
-        motors[2].setPower(bl);
-        motors[3].setPower(br);
+        updateDrive(controller1, controller2, useController1, useController2, defaultSpeedFactor, 0.7, 5d, controller1Dir, controller2Dir, controller2CanOverride);
     }
 
     /**
@@ -714,48 +452,38 @@ public class OptimizedRobot {
         // This is tuned to counteract imperfect strafing
         double strafingCo = 1.5;
 
+        // Temporary Variables to be reassigned
+        OptimizedController controller = controller1;
+        RobotDirection direction = controller1Dir;
 
-        // Our input vars
-        double x = 0, y = 0, rx = 0;
+        //
+        double x, y, rx;
 
-        boolean usingController1 = false;
+        if (((!controller1.atRest() || !useController1) || (controller2CanOverride && controller2.getBool(RobotConfig.NUCLEAR_KEY))) && useController2) {
+            controller = controller2;
+            direction = controller2Dir;
+        }
 
-        if (((!controller1.isBeingUsed() || !useController1) || (controller2.getBool(RobotConfig.NUCLEAR_KEY) && controller2CanOverride)) && useController2) {
-            if (controller2Dir == RobotDirection.FRONT) {
-                x = controller2.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-                y = -controller2.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-                rx = controller2.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else if (controller2Dir == RobotDirection.BACK) {
-                x = -controller2.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-                y = controller2.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-                rx = controller2.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else if (controller2Dir == RobotDirection.LEFT) {
-                x = controller2.getFloat(OptimizedController.Key.LEFT_STICK_Y) * strafingCo;
-                y = controller2.getFloat(OptimizedController.Key.LEFT_STICK_X);
-                rx = controller2.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else {
-                x = -controller2.getFloat(OptimizedController.Key.LEFT_STICK_Y) * strafingCo;
-                y = -controller2.getFloat(OptimizedController.Key.LEFT_STICK_X);
-                rx = controller2.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            }
-        } else if (useController1) {
-            usingController1 = true;
-            if (controller1Dir == RobotDirection.FRONT) {
-                x = controller1.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-                y = -controller1.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-                rx = controller1.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else if (controller1Dir == RobotDirection.BACK) {
-                x = -controller1.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
-                y = controller1.getFloat(OptimizedController.Key.LEFT_STICK_Y);
-                rx = controller1.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else if (controller1Dir == RobotDirection.LEFT) {
-                x = controller1.getFloat(OptimizedController.Key.LEFT_STICK_Y) * strafingCo;
-                y = controller1.getFloat(OptimizedController.Key.LEFT_STICK_X);
-                rx = controller1.getFloat(OptimizedController.Key.RIGHT_STICK_X);
-            } else {
-                x = -controller1.getFloat(OptimizedController.Key.LEFT_STICK_Y) * strafingCo;
-                y = -controller1.getFloat(OptimizedController.Key.LEFT_STICK_X);
-                rx = controller1.getFloat(OptimizedController.Key.RIGHT_STICK_X);
+        double getX = controller.getFloat(OptimizedController.Key.LEFT_STICK_X) * strafingCo;
+        double getY = controller.getFloat(OptimizedController.Key.LEFT_STICK_Y);
+        if(!controller.getBool(OptimizedController.Key.DPAD_DOWN) && !controller.getBool(OptimizedController.Key.DPAD_UP) && !controller.getBool(OptimizedController.Key.DPAD_RIGHT) && !controller.getBool(OptimizedController.Key.DPAD_LEFT)) {
+            x = (Math.abs(getX) < 0.1 && Math.abs(getY) > 0.6) ? 0 : getX;
+            y = (Math.abs(getY) < 0.1 && Math.abs(getX) > 0.6) ? 0 : getY;
+        } else {
+            x = (controller.getBool(OptimizedController.Key.DPAD_LEFT)) ? -1 : ((controller.getBool(OptimizedController.Key.DPAD_RIGHT)) ? 1 : 0);
+            y = (controller.getBool(OptimizedController.Key.DPAD_DOWN)) ? -1 : ((controller.getBool(OptimizedController.Key.DPAD_UP)) ? 1 : 0);
+        }
+        rx = controller.getFloat(OptimizedController.Key.RIGHT_STICK_X);
+
+        if (direction == RobotDirection.FRONT) {
+            y *= -1;
+        } else if (direction == RobotDirection.BACK) {
+            x *= -1;
+        } else {
+            x = y - x + (y = x);
+            if (direction == RobotDirection.RIGHT) {
+                y *= -1;
+                x *= -1;
             }
         }
 
@@ -783,41 +511,21 @@ public class OptimizedRobot {
             fr /= max;
             br /= max;
         }
-
-        if (usingController1) {
-            if (controller1.getBool(OptimizedController.Key.LEFT_BUMPER) && controller1.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
-                fl *= defaultSpeedFactor * (1 / slowmodeFactor);
-                fr *= defaultSpeedFactor * (1 / slowmodeFactor);
-                bl *= defaultSpeedFactor * (1 / slowmodeFactor);
-                br *= defaultSpeedFactor * (1 / slowmodeFactor);
-            } else if (controller1.getBool(OptimizedController.Key.LEFT_BUMPER) || controller1.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
-                fl *= defaultSpeedFactor * (1 / precisionModeFactor);
-                fr *= defaultSpeedFactor * (1 / precisionModeFactor);
-                bl *= defaultSpeedFactor * (1 / precisionModeFactor);
-                br *= defaultSpeedFactor * (1 / precisionModeFactor);
-            } else {
-                fl *= defaultSpeedFactor;
-                fr *= defaultSpeedFactor;
-                bl *= defaultSpeedFactor;
-                br *= defaultSpeedFactor;
-            }
+        if (controller.getBool(OptimizedController.Key.LEFT_BUMPER) && controller.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
+            fl *= defaultSpeedFactor * (1 / slowmodeFactor);
+            fr *= defaultSpeedFactor * (1 / slowmodeFactor);
+            bl *= defaultSpeedFactor * (1 / slowmodeFactor);
+            br *= defaultSpeedFactor * (1 / slowmodeFactor);
+        } else if (controller.getBool(OptimizedController.Key.LEFT_BUMPER) || controller.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
+            fl *= defaultSpeedFactor * (1 / precisionModeFactor);
+            fr *= defaultSpeedFactor * (1 / precisionModeFactor);
+            bl *= defaultSpeedFactor * (1 / precisionModeFactor);
+            br *= defaultSpeedFactor * (1 / precisionModeFactor);
         } else {
-            if (controller2.getBool(OptimizedController.Key.LEFT_BUMPER) && controller2.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
-                fl *= defaultSpeedFactor * (1 / slowmodeFactor);
-                fr *= defaultSpeedFactor * (1 / slowmodeFactor);
-                bl *= defaultSpeedFactor * (1 / slowmodeFactor);
-                br *= defaultSpeedFactor * (1 / slowmodeFactor);
-            } else if (controller2.getBool(OptimizedController.Key.LEFT_BUMPER) || controller2.getBool(OptimizedController.Key.RIGHT_BUMPER)) {
-                fl *= defaultSpeedFactor * (1 / precisionModeFactor);
-                fr *= defaultSpeedFactor * (1 / precisionModeFactor);
-                bl *= defaultSpeedFactor * (1 / precisionModeFactor);
-                br *= defaultSpeedFactor * (1 / precisionModeFactor);
-            } else {
-                fl *= defaultSpeedFactor;
-                fr *= defaultSpeedFactor;
-                bl *= defaultSpeedFactor;
-                br *= defaultSpeedFactor;
-            }
+            fl *= defaultSpeedFactor;
+            fr *= defaultSpeedFactor;
+            bl *= defaultSpeedFactor;
+            br *= defaultSpeedFactor;
         }
 
         motors[1].setPower(fr);
@@ -913,7 +621,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name) {
-        return internalMap.dcMotor.get(name);
+        return getMotor(name, RunMode.RUN_WITHOUT_ENCODER, Direction.FORWARD, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -923,7 +631,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorEx(String name) {
-        return internalMap.get(DcMotorEx.class, name);
+        return getMotorEx(name, RunMode.RUN_WITHOUT_ENCODER, Direction.FORWARD, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -934,9 +642,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, RunMode runmode) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setMode(runmode);
-        return motor;
+        return getMotor(name, runmode, Direction.FORWARD, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -946,9 +652,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorEx(String name, RunMode runmode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
-        motor.setMode(runmode);
-        return motor;
+        return getMotorEx(name, runmode, Direction.FORWARD, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -960,10 +664,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, RunMode runmode, Direction direction) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setMode(runmode);
-        motor.setDirection(direction);
-        return motor;
+        return getMotor(name, runmode, direction, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -975,10 +676,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorEx(String name, RunMode runmode, Direction direction) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
-        motor.setMode(runmode);
-        motor.setDirection(direction);
-        return motor;
+        return getMotorEx(name, runmode, direction, ZeroPowerBehavior.BRAKE);
     }
 
     /**
@@ -1002,23 +700,9 @@ public class OptimizedRobot {
      */
     public DcMotor getMotor(String name, RunMode runmode, Direction direction, ZeroPowerBehavior brakeMode) {
         DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setMode(runmode);
-        motor.setDirection(direction);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
-    }
-
-    /**
-     * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
-     *
-     * @param name      The name of the motor in the hardwareMap
-     * @param runmode   The runmode to use for this motor
-     * @param direction The direction for this motor
-     * @param brakeMode The brake mode for this motor
-     * @return The DCMotor
-     */
-    public DcMotorEx getMotorEx(String name, RunMode runmode, Direction direction, ZeroPowerBehavior brakeMode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
+        if (runmode == RunMode.RUN_TO_POSITION) {
+            motor.setTargetPosition(0);
+        }
         motor.setMode(runmode);
         motor.setDirection(direction);
         motor.setZeroPowerBehavior(brakeMode);
@@ -1034,8 +718,59 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotor(String name, RunMode runmode, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(name);
+        return getMotor(name, runmode, Direction.FORWARD, brakeMode);
+    }
+
+    /**
+     * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
+     *
+     * @param name      The name of the motor in the hardwareMap
+     * @param direction The direction for this motor
+     * @param brakeMode The brake mode for this motor
+     * @return The DCMotor
+     */
+    public DcMotor getMotor(String name, Direction direction, ZeroPowerBehavior brakeMode) {
+        return getMotor(name, RunMode.RUN_WITHOUT_ENCODER, direction, brakeMode);
+    }
+
+    /**
+     * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
+     *
+     * @param name      The name of the motor in the hardwareMap
+     * @param brakeMode The brake mode for this motor
+     * @return The DCMotor
+     */
+    public DcMotor getMotor(String name, ZeroPowerBehavior brakeMode) {
+        return getMotor(name, RunMode.RUN_WITHOUT_ENCODER, Direction.FORWARD, brakeMode);
+    }
+
+    /**
+     * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
+     *
+     * @param name      The name of the motor in the hardwareMap
+     * @param direction The direction for this motor
+     * @return The DCMotor
+     */
+    public DcMotor getMotor(String name, Direction direction) {
+        return getMotor(name, RunMode.RUN_WITHOUT_ENCODER, direction, ZeroPowerBehavior.BRAKE);
+    }
+
+    /**
+     * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
+     *
+     * @param name      The name of the motor in the hardwareMap
+     * @param runmode   The runmode to use for this motor
+     * @param direction The direction for this motor
+     * @param brakeMode The brake mode for this motor
+     * @return The DCMotor
+     */
+    public DcMotorEx getMotorEx(String name, RunMode runmode, Direction direction, ZeroPowerBehavior brakeMode) {
+        DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
+        if (runmode == RunMode.RUN_TO_POSITION) {
+            motor.setTargetPosition(0);
+        }
         motor.setMode(runmode);
+        motor.setDirection(direction);
         motor.setZeroPowerBehavior(brakeMode);
         return motor;
     }
@@ -1049,25 +784,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorEx(String name, RunMode runmode, ZeroPowerBehavior brakeMode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
-        motor.setMode(runmode);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
-    }
-
-    /**
-     * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
-     *
-     * @param name      The name of the motor in the hardwareMap
-     * @param direction The direction for this motor
-     * @param brakeMode The brake mode for this motor
-     * @return The DCMotor
-     */
-    public DcMotor getMotor(String name, Direction direction, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setDirection(direction);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotorEx(name, runmode, Direction.FORWARD, brakeMode);
     }
 
     /**
@@ -1079,23 +796,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorEx(String name, Direction direction, ZeroPowerBehavior brakeMode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
-        motor.setDirection(direction);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
-    }
-
-    /**
-     * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
-     *
-     * @param name      The name of the motor in the hardwareMap
-     * @param brakeMode The brake mode for this motor
-     * @return The DCMotor
-     */
-    public DcMotor getMotor(String name, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotorEx(name, RunMode.RUN_WITHOUT_ENCODER, direction, brakeMode);
     }
 
     /**
@@ -1106,22 +807,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorEx(String name, ZeroPowerBehavior brakeMode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
-    }
-
-    /**
-     * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
-     *
-     * @param name      The name of the motor in the hardwareMap
-     * @param direction The direction for this motor
-     * @return The DCMotor
-     */
-    public DcMotor getMotor(String name, Direction direction) {
-        DcMotor motor = internalMap.dcMotor.get(name);
-        motor.setDirection(direction);
-        return motor;
+        return getMotorEx(name, RunMode.RUN_WITHOUT_ENCODER, Direction.FORWARD, brakeMode);
     }
 
     /**
@@ -1132,9 +818,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorEx(String name, Direction direction) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, name);
-        motor.setDirection(direction);
-        return motor;
+        return getMotorEx(name, RunMode.RUN_WITHOUT_ENCODER, direction, ZeroPowerBehavior.BRAKE);
     }
 
 
@@ -1164,7 +848,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotorByAlias(String alias) {
-        return internalMap.dcMotor.get(findMapNameByAlias(alias));
+        return getMotor(findMapNameByAlias(alias));
     }
 
     /**
@@ -1175,9 +859,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotorByAlias(String alias, RunMode runmode) {
-        DcMotor motor = internalMap.dcMotor.get(findMapNameByAlias(alias));
-        motor.setMode(runmode);
-        return motor;
+        return getMotor(findMapNameByAlias(alias), runmode);
     }
 
     /**
@@ -1189,10 +871,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotorByAlias(String alias, RunMode runmode, Direction direction) {
-        DcMotor motor = internalMap.dcMotor.get(findMapNameByAlias(alias));
-        motor.setMode(runmode);
-        motor.setDirection(direction);
-        return motor;
+        return getMotor(findMapNameByAlias(alias), runmode, direction);
     }
 
     /**
@@ -1205,11 +884,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotorByAlias(String alias, RunMode runmode, Direction direction, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(findMapNameByAlias(alias));
-        motor.setMode(runmode);
-        motor.setDirection(direction);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotor(findMapNameByAlias(alias), runmode, direction, brakeMode);
     }
 
     /**
@@ -1221,10 +896,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotorByAlias(String alias, RunMode runmode, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(findMapNameByAlias(alias));
-        motor.setMode(runmode);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotor(findMapNameByAlias(alias), runmode, brakeMode);
     }
 
     /**
@@ -1236,10 +908,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotorByAlias(String alias, Direction direction, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(findMapNameByAlias(alias));
-        motor.setDirection(direction);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotor(findMapNameByAlias(alias), direction, brakeMode);
     }
 
     /**
@@ -1250,9 +919,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotorByAlias(String alias, ZeroPowerBehavior brakeMode) {
-        DcMotor motor = internalMap.dcMotor.get(findMapNameByAlias(alias));
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotor(findMapNameByAlias(alias), brakeMode);
     }
 
     /**
@@ -1263,11 +930,8 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotor getMotorByAlias(String alias, Direction direction) {
-        DcMotor motor = internalMap.dcMotor.get(findMapNameByAlias(alias));
-        motor.setDirection(direction);
-        return motor;
+        return getMotor(findMapNameByAlias(alias));
     }
-
 
     /**
      * Returns a motor to be used in an OpMode (please do not use this for drive motors, as everything is handled here)
@@ -1276,7 +940,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorExByAlias(String alias) {
-        return internalMap.get(DcMotorEx.class, findMapNameByAlias(alias));
+        return getMotorEx(findMapNameByAlias(alias));
     }
 
     /**
@@ -1287,9 +951,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorExByAlias(String alias, RunMode runmode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, findMapNameByAlias(alias));
-        motor.setMode(runmode);
-        return motor;
+        return getMotorEx(findMapNameByAlias(alias), runmode);
     }
 
     /**
@@ -1301,10 +963,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorExByAlias(String alias, RunMode runmode, Direction direction) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, findMapNameByAlias(alias));
-        motor.setMode(runmode);
-        motor.setDirection(direction);
-        return motor;
+        return getMotorEx(findMapNameByAlias(alias), runmode, direction);
     }
 
     /**
@@ -1317,11 +976,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorExByAlias(String alias, RunMode runmode, Direction direction, ZeroPowerBehavior brakeMode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, findMapNameByAlias(alias));
-        motor.setMode(runmode);
-        motor.setDirection(direction);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotorEx(findMapNameByAlias(alias), runmode, direction, brakeMode);
     }
 
     /**
@@ -1333,10 +988,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorExByAlias(String alias, RunMode runmode, ZeroPowerBehavior brakeMode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, findMapNameByAlias(alias));
-        motor.setMode(runmode);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotorEx(findMapNameByAlias(alias), runmode, brakeMode);
     }
 
     /**
@@ -1348,10 +1000,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorExByAlias(String alias, Direction direction, ZeroPowerBehavior brakeMode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, findMapNameByAlias(alias));
-        motor.setDirection(direction);
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotorEx(findMapNameByAlias(alias), direction, brakeMode);
     }
 
     /**
@@ -1362,9 +1011,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorExByAlias(String alias, ZeroPowerBehavior brakeMode) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, findMapNameByAlias(alias));
-        motor.setZeroPowerBehavior(brakeMode);
-        return motor;
+        return getMotorEx(findMapNameByAlias(alias), brakeMode);
     }
 
     /**
@@ -1375,9 +1022,7 @@ public class OptimizedRobot {
      * @return The DCMotor
      */
     public DcMotorEx getMotorExByAlias(String alias, Direction direction) {
-        DcMotorEx motor = internalMap.get(DcMotorEx.class, findMapNameByAlias(alias));
-        motor.setDirection(direction);
-        return motor;
+        return getMotorEx(findMapNameByAlias(alias), direction);
     }
 
     /**
@@ -1447,24 +1092,7 @@ public class OptimizedRobot {
      * If not, the parameter-less version will run with default settings for teleop
      */
     protected void initializeDriveMotors() {
-        if (!disabledMotors[0]) {
-            motors[0] = internalMap.dcMotor.get("frontLeftMotor");
-        }
-        if (!disabledMotors[1]) {
-            motors[1] = internalMap.dcMotor.get("frontRightMotor");
-        }
-        if (!disabledMotors[2]) {
-            motors[2] = internalMap.dcMotor.get("backLeftMotor");
-        }
-        if (!disabledMotors[3]) {
-            motors[3] = internalMap.dcMotor.get("backRightMotor");
-        }
-
-        runWithEncoder(false);
-
-        motorDir(true);
-
-        setMotorBrakeType(ZeroPowerBehavior.FLOAT);
+        initializeDriveMotors(true, false, ZeroPowerBehavior.BRAKE);
     }
 
     public void initializeDriveMotors(boolean isForward, boolean runsEncoders, ZeroPowerBehavior brakeType) {
@@ -1492,74 +1120,14 @@ public class OptimizedRobot {
     }
 
     public void initializeDriveMotors(boolean isForward, boolean runsEncoders) {
-
-        hasInitializedMotors = true;
-
-        if (!disabledMotors[0]) {
-            motors[0] = internalMap.dcMotor.get("frontLeftMotor");
-        }
-        if (!disabledMotors[1]) {
-            motors[1] = internalMap.dcMotor.get("frontRightMotor");
-        }
-        if (!disabledMotors[2]) {
-            motors[2] = internalMap.dcMotor.get("backLeftMotor");
-        }
-        if (!disabledMotors[3]) {
-            motors[3] = internalMap.dcMotor.get("backRightMotor");
-        }
-
-        runWithEncoder(runsEncoders);
-
-        motorDir(isForward);
-
-        setMotorBrakeType(ZeroPowerBehavior.FLOAT);
+        initializeDriveMotors(isForward, runsEncoders, ZeroPowerBehavior.BRAKE);
     }
 
     public void initializeDriveMotors(boolean isForward, ZeroPowerBehavior brakeType) {
-
-        hasInitializedMotors = true;
-
-        if (!disabledMotors[0]) {
-            motors[0] = internalMap.dcMotor.get("frontLeftMotor");
-        }
-        if (!disabledMotors[1]) {
-            motors[1] = internalMap.dcMotor.get("frontRightMotor");
-        }
-        if (!disabledMotors[2]) {
-            motors[2] = internalMap.dcMotor.get("backLeftMotor");
-        }
-        if (!disabledMotors[3]) {
-            motors[3] = internalMap.dcMotor.get("backRightMotor");
-        }
-
-        runWithEncoder(false);
-
-        motorDir(isForward);
-
-        setMotorBrakeType(brakeType);
+        initializeDriveMotors(isForward, false, ZeroPowerBehavior.BRAKE);
     }
 
     public void initializeDriveMotors(boolean runsEncoders) {
-
-        hasInitializedMotors = true;
-
-        if (!disabledMotors[0]) {
-            motors[0] = internalMap.dcMotor.get("frontLeftMotor");
-        }
-        if (!disabledMotors[1]) {
-            motors[1] = internalMap.dcMotor.get("frontRightMotor");
-        }
-        if (!disabledMotors[2]) {
-            motors[2] = internalMap.dcMotor.get("backLeftMotor");
-        }
-        if (!disabledMotors[3]) {
-            motors[3] = internalMap.dcMotor.get("backRightMotor");
-        }
-
-        runWithEncoder(runsEncoders);
-
-        motorDir(true);
-
-        setMotorBrakeType(ZeroPowerBehavior.FLOAT);
+        initializeDriveMotors(true, runsEncoders, ZeroPowerBehavior.BRAKE);
     }
 }

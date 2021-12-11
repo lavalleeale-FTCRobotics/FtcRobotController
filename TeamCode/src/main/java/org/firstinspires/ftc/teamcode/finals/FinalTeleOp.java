@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.internal.NumberFunctions;
 import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.internal.RobotConfig;
@@ -26,8 +27,8 @@ public class FinalTeleOp extends OpMode {
     int armStart = -3200;
     int frontHighOuttake = -2220;
     int backHighOuttake = -900;
-    int frontLowOuttake = -2000;
-    int backLowOuttake = -450;
+    int frontLowOuttake = -2950;
+    int backLowOuttake = -250;
 
     @Override
     public void init() {
@@ -39,10 +40,11 @@ public class FinalTeleOp extends OpMode {
         robot = new OptimizedRobot(controller1, controller2, telemetry, hardwareMap, new FreightFrenzyControllerMapping());
         duckSpinner = robot.getMotor("duckSpinner");
         arm = robot.getMotor("arm", DcMotor.RunMode.RUN_TO_POSITION);
-        odometry = robot.getMotor("odometry");
+        odometry = robot.getMotor("odometry", DcMotor.RunMode.RUN_USING_ENCODER);
         intake = robot.getMotor("intake");
 
         colorSensor = hardwareMap.colorSensor.get("colorSensor");
+        colorSensor.enableLed(true);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -74,7 +76,7 @@ public class FinalTeleOp extends OpMode {
                     arm.setTargetPosition(robot.getControl("ArmHeight") ? frontLowOuttake : frontHighOuttake);
                 } else {
                     // Set to Back High Outtake if ArmHeight is true, otherwise to to Back Low Outtake
-                    arm.setTargetPosition(robot.getControl("ArmHeight") ?  backLowOuttake: backHighOuttake);
+                    arm.setTargetPosition(robot.getControl("ArmHeight") ? backLowOuttake : backHighOuttake);
                 }
             } else {
                 // Move Arm to Intake Position
@@ -94,15 +96,16 @@ public class FinalTeleOp extends OpMode {
             intake.setPower(robot.getControlFloat("Intake") - robot.getControlFloat("Outtake"));
         }
 
-        colorSensor.enableLed(true);
-        log.add(String.valueOf(colorSensor.green()>1000));
+        if ((robot.getControl("IntakeButton") || robot.getControlFloat("Intake") > 0) && colorSensor.green() > 1000 && colorSensor.red() > 1000 && robot.synchronousDelayGateCOMPLETE("IntakeSound", getRuntime(), 2)) {
+            telemetry.speak("Box");
+        }
 
         // Set odometry power to the left stick cubed, to add mild curving
         odometry.setPower(Math.pow(robot.getControlFloat("Odometry"), 3));
-        log.add("Arm Position: " + arm.getCurrentPosition());
+        log.add("Odo Position: " + odometry.getCurrentPosition());
         log.clear();
 
         // Main drive method
-        robot.updateDrive(controller1, controller2, true, false, 0.7d, OptimizedRobot.RobotDirection.FRONT, OptimizedRobot.RobotDirection.FRONT, false);
+        robot.updateDrive(controller1, controller2, true, false, 0.7d, OptimizedRobot.RobotDirection.BACK, OptimizedRobot.RobotDirection.BACK, false);
     }
 }

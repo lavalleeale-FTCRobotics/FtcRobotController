@@ -58,6 +58,7 @@ import static org.firstinspires.ftc.teamcode.internal.roadrunner.drive.DriveCons
 import static org.firstinspires.ftc.teamcode.internal.roadrunner.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.internal.roadrunner.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.internal.roadrunner.drive.DriveConstants.kV;
+import org.firstinspires.ftc.teamcode.internal.roadrunner.drive.DriveConstants;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
@@ -104,11 +105,15 @@ public class SampleMecanumDrive extends MecanumDrive {
     private final DcMotorEx rightRear;
     private final DcMotorEx rightFront;
     private final List<DcMotorEx> motors;
-    private final BNO055IMU imu;
+    public final BNO055IMU imu;
 
     private final VoltageSensor batteryVoltageSensor;
 
     private Pose2d lastPoseOnTurn;
+
+    public void cancelFollowing(){
+        mode = Mode.IDLE;
+    }
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
@@ -141,7 +146,7 @@ public class SampleMecanumDrive extends MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-
+        // Don't need this section for 3-wheel
         imu = hardwareMap.get(BNO055IMU.class, DriveConstants.IMU_NAME);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
@@ -149,7 +154,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
         // upward (normal to the floor) using a command like the following:
-        BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+        //BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
         leftFront = hardwareMap.get(DcMotorEx.class, DriveConstants.FRONT_LEFT_MOTOR);
         leftRear = hardwareMap.get(DcMotorEx.class, DriveConstants.BACK_LEFT_MOTOR);
@@ -182,7 +187,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         rightRear.setDirection(DriveConstants.motorDirections[3]);
 
         // TODO: if desired, use setLocalizer() to change the localization method
-        setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
+        setLocalizer(new org.firstinspires.ftc.internal.roadrunner.drive.TwoWheelTrackingLocalizer(hardwareMap, this));
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {

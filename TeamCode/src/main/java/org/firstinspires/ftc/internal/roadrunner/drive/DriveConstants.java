@@ -25,13 +25,13 @@ public class DriveConstants {
     public static final double TICKS_PER_REV = 537.6;
     public static final double MAX_RPM = 312;
     public static double WHEEL_RADIUS = 1.89; // inches.
-    public static double GEAR_RATIO = 19.2; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 17.5; // inches. DOESN'T necessarily need to reflect the ACTUAL track width
+    public static double GEAR_RATIO = -19.2; // output (wheel) speed / input (motor) speed
+    public static double TRACK_WIDTH = 11.5; // inches. DOESN'T necessarily need to reflect the ACTUAL track width
 
 
 
     // IMU Name
-    public static final String IMU_NAME = "imu";
+    public static final String IMU_NAME = "imu 1";
 
 
     // For encoders on odometry ONLY
@@ -41,13 +41,12 @@ public class DriveConstants {
     public static final double ODOMETRY_WHEEL_RADIUS = 0.75; // in
     // For standard dead wheels, this will be 1:1
     public static final double ODOMETRY_GEAR_RATIO = 1;
-    public static final double ODOMETRY_FORWARD_OFFSET = 6.5; // in
-    public static double ODOMETRY_TRACK_WIDTH = 14.655786; // in
+    public static final double ODOMETRY_FORWARD_OFFSET = 2d; // in
+    public static final double ODOMETRY_TRACK_WIDTH = 6.625; // in
 
     // TODO: Tune this for dead-wheel calibration
-    public static double ODO_X_MULTIPLIER = 1.0202262; // Multiplier in the X direction (for left and right)
-    public static double ODO_Y_MULTIPLIER = 1.02396659; // Multiplier in the Y direction (for strafe/lateral dir)
-
+    public static double ODO_X_MULTIPLIER = 1.00407; // Multiplier in the X direction (for left and right)
+    public static double ODO_Y_MULTIPLIER = 1.00167; // Multiplier in the Y direction (for strafe/lateral dir)
 
     // TODO: Set these to your hardware map motor names
     public static final String FRONT_RIGHT_MOTOR = "frontRightMotor";
@@ -55,16 +54,16 @@ public class DriveConstants {
     public static final String BACK_RIGHT_MOTOR = "backRightMotor";
     public static final String BACK_LEFT_MOTOR = "backLeftMotor";
 
-    public static final String LEFT_ENCODER = "leftEncoder";
-    public static final String RIGHT_ENCODER = "rightEncoder";
-    public static final String STRAFE_ENCODER = "strafeEncoder";
+    public static final String LEFT_ENCODER = "frontRightMotor";
+    public static final String RIGHT_ENCODER = "backRightMotor";
+    public static final String STRAFE_ENCODER = "frontLeftMotor";
 
 
     // TODO: Change motor directions {FL, FR, BL, BR}
     public static final DcMotorSimple.Direction[] motorDirections = {DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD};
 
     // TODO: If your hub is mounted vertically
-    public static boolean HUB_MOUNTED_VERTICAL = false;
+    public static final boolean HUB_MOUNTED_VERTICAL = false;
 
 
 
@@ -101,9 +100,9 @@ public class DriveConstants {
     // kV             0.01                     0.017
     // kStatic        0.01                     0.05
     // kA             0.001          z          0.003
-    public static double kV = 0.0178; // 0.016 also seems to work sometimes
-    public static double kA = 0.006;
-    public static double kStatic = 0.03;
+    public static final double kV = 0.0178; // 0.016 also seems to work sometimes
+    public static final double kA = 0.006;
+    public static final double kStatic = 0.03;
 
 
     // 0.0176 -- 12.7 V
@@ -120,10 +119,10 @@ public class DriveConstants {
      * small and gradually increase them later after everything is working. All distance units are
      * inches.
      */
-    public static double MAX_VEL = 50;
-    public static double MAX_ACCEL = 30;
-    public static double MAX_ANG_VEL = 12.416;
-    public static double MAX_ANG_ACCEL = Math.toRadians(60);
+    public static final double MAX_VEL = 35;
+    public static final double MAX_ACCEL = 20;
+    public static final double MAX_ANG_VEL = 15;
+    public static final double MAX_ANG_ACCEL = Math.toRadians(35);
 
 
     public static double encoderTicksToInches(double ticks) {

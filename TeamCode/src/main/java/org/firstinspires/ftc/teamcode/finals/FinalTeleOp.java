@@ -27,8 +27,9 @@ public class FinalTeleOp extends OpMode {
     int armStart = -3200;
     int frontHighOuttake = -2220;
     int backHighOuttake = -900;
-    int frontLowOuttake = -2950;
-    int backLowOuttake = -250;
+    int frontLowOuttake = -2900;
+    int backLowOuttake = -420;
+    boolean detectingBlock = true;
 
     @Override
     public void init() {
@@ -52,9 +53,21 @@ public class FinalTeleOp extends OpMode {
     public void loop() {
         // Duck Spinner
         if (robot.getControl("Duck")) {
-            duckSpinner.setPower(RobotConfig.SPINNER_SPEED);
+            if (robot.synchronousDelayGateOPEN("Duck", getRuntime(), 0.8)) {
+                duckSpinner.setPower(1);
+            } else {
+                duckSpinner.setPower(0.6);
+            }
+        } else if (robot.getControl("DuckReverse")) {
+            if (robot.synchronousDelayGateOPEN("DuckReverse", getRuntime(), 0.8)) {
+                duckSpinner.setPower(-1);
+            } else {
+                duckSpinner.setPower(-0.6);
+            }
         } else {
-            duckSpinner.setPower(-robot.getControlFloat("DuckSpeed"));
+            duckSpinner.setPower(0);
+            robot.synchronousDelayGateCLOSE("Duck");
+            robot.synchronousDelayGateCLOSE("DuckReverse");
         }
 
         // If Arm Is Being Manually Controlled
@@ -69,7 +82,7 @@ public class FinalTeleOp extends OpMode {
             // Set Arm's Power to full
             arm.setPower(RobotConfig.ARM_POWER);
             // If Arm is in Outtake Mode
-            if (!robot.getControl("ArmIntake")) {
+            if (robot.getControl("ArmOuttake")) {
                 // If Arm's Outtake Mode is the Front
                 if (robot.getControl("ArmSide")) {
                     // Set to Front High Outtake if ArmHeight is true, otherwise to to Front Low Outtake
@@ -96,16 +109,28 @@ public class FinalTeleOp extends OpMode {
             intake.setPower(robot.getControlFloat("Intake") - robot.getControlFloat("Outtake"));
         }
 
-        if ((robot.getControl("IntakeButton") || robot.getControlFloat("Intake") > 0) && colorSensor.green() > 1000 && colorSensor.red() > 1000 && robot.synchronousDelayGateCOMPLETE("IntakeSound", getRuntime(), 2)) {
+        if (!detectingBlock && colorSensor.red() > 1000 && colorSensor.green() > 1000) {
             telemetry.speak("Box");
+            detectingBlock = true;
+        } else if (colorSensor.red() < 1000 || colorSensor.green() < 1000) {
+            detectingBlock = false;
         }
+
+
+//        log.add(colorSensor.red() + " " + colorSensor.green());
+//        if (detectingBlock) {
+//            telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
+//            telemetry.addData("TEST", "<h1>88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888</h1>");
+//        } else {
+//            telemetry.clearAll();
+//        }
 
         // Set odometry power to the left stick cubed, to add mild curving
         odometry.setPower(Math.pow(robot.getControlFloat("Odometry"), 3));
-        log.add("Odo Position: " + odometry.getCurrentPosition());
+        log.add("Arm Position: " + arm.getCurrentPosition());
         log.clear();
 
         // Main drive method
-        robot.updateDrive(controller1, controller2, true, false, 0.7d, OptimizedRobot.RobotDirection.BACK, OptimizedRobot.RobotDirection.BACK, false);
+        robot.updateDrive(controller1, controller2, true, false, 1d, OptimizedRobot.RobotDirection.BACK, OptimizedRobot.RobotDirection.BACK, false);
     }
 }

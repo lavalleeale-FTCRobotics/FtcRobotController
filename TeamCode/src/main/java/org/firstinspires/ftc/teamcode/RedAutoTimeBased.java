@@ -8,8 +8,6 @@ import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedDriveFunctions;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
-import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
 
 @Autonomous
 public class RedAutoTimeBased extends LinearOpMode {
@@ -23,9 +21,7 @@ public class RedAutoTimeBased extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new OptimizedRobot(gamepad1, gamepad2, telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
-        controller1 = new OptimizedController(gamepad1);
-        controller2 = new OptimizedController(gamepad2);
+        robot = new OptimizedRobot(telemetry, hardwareMap);
 
         log = telemetry.log();
 

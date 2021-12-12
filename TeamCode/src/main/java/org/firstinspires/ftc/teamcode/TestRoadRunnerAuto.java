@@ -46,14 +46,17 @@ public class TestRoadRunnerAuto extends LinearOpMode {
 //        }
         drive.followTrajectory(drive.trajectoryBuilder(new Pose2d())
                 .splineTo(new Vector2d(30, 0), Math.toRadians(90)).build());
-
-        while(true){
-            drive.followTrajectory(drive.trajectoryBuilder(new Pose2d(30, 0, Math.toRadians(90)))
-                    .splineTo(new Vector2d(0, 30), Math.toRadians(180))
-                    .splineTo(new Vector2d(-30, 0), Math.toRadians(-90))
-                    .splineTo(new Vector2d(0, -30), Math.toRadians(0))
-                    .splineTo(new Vector2d(30, 0), Math.toRadians(90))
-                    .build());
+        if(opModeIsActive()) {
+            while (opModeIsActive()) {
+                if(opModeIsActive()) {
+                    drive.followTrajectory(drive.trajectoryBuilder(new Pose2d((opModeIsActive()) ? 30 : 0, 0, Math.toRadians(90)))
+                            .splineTo(new Vector2d(0, 30), Math.toRadians(180))
+                            .splineTo(new Vector2d(-30, 0), Math.toRadians(-90))
+                            .splineTo(new Vector2d(0, -30), Math.toRadians(0))
+                            .splineTo(new Vector2d(30, 0), Math.toRadians(90))
+                            .build());
+                }
+            }
         }
     }
 }

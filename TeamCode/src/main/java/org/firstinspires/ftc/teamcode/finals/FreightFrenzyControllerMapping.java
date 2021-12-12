@@ -31,14 +31,14 @@ public class FreightFrenzyControllerMapping implements ControllerMapping {
 
         mapping.put("ArmSmooth", new ControlInput(OptimizedController.Key.RIGHT_STICK_Y, Controller.CONTROLLER2, Type.FLOAT));
 
-        mapping.put("ArmIntake", new ControlInput(OptimizedController.Key.A, Controller.CONTROLLER2, Type.TOGGLE));
+        mapping.put("ArmOuttake", new ControlInput(OptimizedController.Key.A, Controller.CONTROLLER2, Type.TOGGLE));
         mapping.put("ArmHeight", new ControlInput(OptimizedController.Key.RIGHT_STICK_BUTTON, Controller.CONTROLLER2, Type.TOGGLE));
         mapping.put("ArmSide", new ControlInput(OptimizedController.Key.LEFT_BUMPER, Controller.CONTROLLER2, Type.TOGGLE));
-        mapping.put("ArmControl", new ControlInput(OptimizedController.Key.X, Controller.CONTROLLER2, Type.TOGGLE));
+        mapping.put("ArmControl", new ControlInput(OptimizedController.Key.Y, Controller.CONTROLLER2, Type.TOGGLE));
 
         mapping.put("Odometry", new ControlInput(OptimizedController.Key.LEFT_STICK_Y, Controller.CONTROLLER2, Type.FLOAT));
-        mapping.put("Duck", new ControlInput(OptimizedController.Key.RIGHT_BUMPER, Controller.CONTROLLER2, Type.BOOL));
-        mapping.put("DuckSpeed", new ControlInput(OptimizedController.Key.RIGHT_TRIGGER, Controller.CONTROLLER2, Type.FLOAT));
+        mapping.put("DuckReverse", new ControlInput(OptimizedController.Key.B, Controller.CONTROLLER2, Type.TOGGLE));
+        mapping.put("Duck", new ControlInput(OptimizedController.Key.X, Controller.CONTROLLER2, Type.TOGGLE));
 
         mapping.put("Intake", new ControlInput(OptimizedController.Key.RIGHT_TRIGGER, Controller.CONTROLLER1, Type.FLOAT));
         mapping.put("Outtake", new ControlInput(OptimizedController.Key.LEFT_TRIGGER, Controller.CONTROLLER1, Type.FLOAT));

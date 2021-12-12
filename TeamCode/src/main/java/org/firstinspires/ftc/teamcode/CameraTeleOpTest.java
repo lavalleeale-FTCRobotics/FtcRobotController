@@ -11,8 +11,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.teamcode.examples.SampleControllerMapping;
-import org.firstinspires.ftc.teamcode.examples.SampleHardwareAliasMapping;
 
 import java.util.List;
 
@@ -41,7 +39,7 @@ public class CameraTeleOpTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        robot = new OptimizedRobot(gamepad1, gamepad2, telemetry, hardwareMap, new SampleControllerMapping(), new SampleHardwareAliasMapping());
+        robot = new OptimizedRobot(telemetry, hardwareMap);
 
         FRMotor = robot.getMotor("FRMotor", DcMotorSimple.Direction.REVERSE);
         FLMotor = robot.getMotor("FLMotor", DcMotorSimple.Direction.FORWARD);

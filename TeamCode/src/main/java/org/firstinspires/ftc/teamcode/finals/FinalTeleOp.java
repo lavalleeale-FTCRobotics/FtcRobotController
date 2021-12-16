@@ -6,12 +6,9 @@ import androidx.annotation.RequiresApi;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.internal.NumberFunctions;
 import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.internal.RobotConfig;
@@ -29,7 +26,6 @@ public class FinalTeleOp extends OpMode {
     int backHighOuttake = -900;
     int frontLowOuttake = -2900;
     int backLowOuttake = -420;
-    boolean detectingBlock = true;
 
     @Override
     public void init() {
@@ -52,13 +48,13 @@ public class FinalTeleOp extends OpMode {
     @Override
     public void loop() {
         // Duck Spinner
-        if (robot.getControl("Duck")) {
+        if (robot.getControlBool("Duck")) {
             if (robot.synchronousDelayGateOPEN("Duck", getRuntime(), 0.8)) {
                 duckSpinner.setPower(1);
             } else {
                 duckSpinner.setPower(0.6);
             }
-        } else if (robot.getControl("DuckReverse")) {
+        } else if (robot.getControlBool("DuckReverse")) {
             if (robot.synchronousDelayGateOPEN("DuckReverse", getRuntime(), 0.8)) {
                 duckSpinner.setPower(-1);
             } else {
@@ -71,7 +67,7 @@ public class FinalTeleOp extends OpMode {
         }
 
         // If Arm Is Being Manually Controlled
-        if (robot.getControl("ArmControl")) {
+        if (robot.getControlBool("ArmControl")) {
             // Set Arm's Mode to Manual Control
             arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             // Set Power to "ArmSmooth" Float
@@ -82,14 +78,14 @@ public class FinalTeleOp extends OpMode {
             // Set Arm's Power to full
             arm.setPower(RobotConfig.ARM_POWER);
             // If Arm is in Outtake Mode
-            if (robot.getControl("ArmOuttake")) {
+            if (robot.getControlBool("ArmOuttake")) {
                 // If Arm's Outtake Mode is the Front
-                if (robot.getControl("ArmSide")) {
+                if (robot.getControlBool("ArmSide")) {
                     // Set to Front High Outtake if ArmHeight is true, otherwise to to Front Low Outtake
-                    arm.setTargetPosition(robot.getControl("ArmHeight") ? frontLowOuttake : frontHighOuttake);
+                    arm.setTargetPosition(robot.getControlBool("ArmHeight") ? frontLowOuttake : frontHighOuttake);
                 } else {
                     // Set to Back High Outtake if ArmHeight is true, otherwise to to Back Low Outtake
-                    arm.setTargetPosition(robot.getControl("ArmHeight") ? backLowOuttake : backHighOuttake);
+                    arm.setTargetPosition(robot.getControlBool("ArmHeight") ? backLowOuttake : backHighOuttake);
                 }
             } else {
                 // Move Arm to Intake Position
@@ -98,32 +94,23 @@ public class FinalTeleOp extends OpMode {
         }
 
         // If IntakeButton is pressed
-        if (robot.getControl("IntakeButton")) {
+        if (robot.getControlBool("OuttakeButton")) {
             // Intake with full power
             intake.setPower(1);
-        } else if (robot.getControl("OuttakeButton")) {
+        } else if (robot.getControlBool("IntakeButton")) {
             // Outtake with full power
             intake.setPower(-1);
         } else {
             // Set Intake/Outtake Power to Intake Float - Outtake Float
-            intake.setPower(robot.getControlFloat("Intake") - robot.getControlFloat("Outtake"));
+            intake.setPower(robot.getControlFloat("Outtake") - robot.getControlFloat("Intake"));
         }
 
-        if (!detectingBlock && colorSensor.red() > 1000 && colorSensor.green() > 1000) {
-            telemetry.speak("Box");
-            detectingBlock = true;
-        } else if (colorSensor.red() < 1000 || colorSensor.green() < 1000) {
-            detectingBlock = false;
+        if (colorSensor.red() > 1000 && colorSensor.green() > 1000 && (robot.getControlBool("IntakeButton") || robot.getControlFloat("Intake") > 0)) {
+            robot.setToggle("ArmOuttake", true);
+            controller1.vibrate();
+        } else {
+            controller1.stopVibrate();
         }
-
-
-//        log.add(colorSensor.red() + " " + colorSensor.green());
-//        if (detectingBlock) {
-//            telemetry.setDisplayFormat(Telemetry.DisplayFormat.HTML);
-//            telemetry.addData("TEST", "<h1>88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888</h1>");
-//        } else {
-//            telemetry.clearAll();
-//        }
 
         // Set odometry power to the left stick cubed, to add mild curving
         odometry.setPower(Math.pow(robot.getControlFloat("Odometry"), 3));

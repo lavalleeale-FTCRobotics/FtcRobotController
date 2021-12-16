@@ -40,10 +40,10 @@ public class FreightFrenzyControllerMapping implements ControllerMapping {
         mapping.put("DuckReverse", new ControlInput(OptimizedController.Key.B, Controller.CONTROLLER2, Type.TOGGLE));
         mapping.put("Duck", new ControlInput(OptimizedController.Key.X, Controller.CONTROLLER2, Type.TOGGLE));
 
-        mapping.put("Intake", new ControlInput(OptimizedController.Key.RIGHT_TRIGGER, Controller.CONTROLLER1, Type.FLOAT));
-        mapping.put("Outtake", new ControlInput(OptimizedController.Key.LEFT_TRIGGER, Controller.CONTROLLER1, Type.FLOAT));
-        mapping.put("IntakeButton", new ControlInput(OptimizedController.Key.RIGHT_BUMPER, Controller.CONTROLLER1, Type.BOOL));
-        mapping.put("OuttakeButton", new ControlInput(OptimizedController.Key.LEFT_BUMPER, Controller.CONTROLLER1, Type.BOOL));
+        mapping.put("Outtake", new ControlInput(OptimizedController.Key.RIGHT_TRIGGER, Controller.CONTROLLER1, Type.FLOAT));
+        mapping.put("Intake", new ControlInput(OptimizedController.Key.LEFT_TRIGGER, Controller.CONTROLLER1, Type.FLOAT));
+        mapping.put("OuttakeButton", new ControlInput(OptimizedController.Key.RIGHT_BUMPER, Controller.CONTROLLER1, Type.BOOL));
+        mapping.put("IntakeButton", new ControlInput(OptimizedController.Key.LEFT_BUMPER, Controller.CONTROLLER1, Type.BOOL));
 
         return mapping;
     }

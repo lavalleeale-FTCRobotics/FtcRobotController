@@ -61,12 +61,28 @@ public class OptimizedController {
     }
 
     /**
+     * Setter Method For {@link #toggledList }
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void setToggle(Key key, boolean value) {
+        toggledList.replace(key, value);
+    }
+
+    /**
      * Are all analog sticks and triggers in their rest position?
      *
      * @return true if all analog sticks and triggers are at rest; otherwise false
      */
     public boolean atRest() {
         return internalGamepad.atRest();
+    }
+
+    public void vibrate() {
+        internalGamepad.rumble(1000);
+    }
+
+    public void stopVibrate() {
+        internalGamepad.stopRumble();
     }
 
     /**
@@ -140,13 +156,13 @@ public class OptimizedController {
 
         switch (key) {
             case A:
-                return internalGamepad.a;
+                return internalGamepad.a || internalGamepad.cross;
             case B:
-                return internalGamepad.b;
+                return internalGamepad.b || internalGamepad.circle;
             case X:
-                return internalGamepad.x;
+                return internalGamepad.x || internalGamepad.square;
             case Y:
-                return internalGamepad.y;
+                return internalGamepad.y || internalGamepad.triangle;
             case LEFT_BUMPER:
                 return internalGamepad.left_bumper;
             case RIGHT_BUMPER:
@@ -160,9 +176,9 @@ public class OptimizedController {
             case DPAD_RIGHT:
                 return internalGamepad.dpad_right;
             case START:
-                return internalGamepad.start;
+                return internalGamepad.start || internalGamepad.options;
             case BACK:
-                return internalGamepad.back;
+                return internalGamepad.back || internalGamepad.share;
             case LEFT_STICK_X:
                 return !NumberFunctions.isZero(internalGamepad.left_stick_x);
             case LEFT_STICK_Y:

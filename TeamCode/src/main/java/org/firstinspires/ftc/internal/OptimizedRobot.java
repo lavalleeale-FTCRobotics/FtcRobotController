@@ -302,7 +302,7 @@ public class OptimizedRobot {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Experimental
-    public boolean getControl(String controlName) {
+    public boolean getControlBool(String controlName) {
         ControllerMapping.ControlInput input = controlMap.get(controlName);
         if (input.controller != ControllerMapping.Controller.BOTH) {
             OptimizedController controller = input.controller == ControllerMapping.Controller.CONTROLLER1 ? controller1 : controller2;
@@ -321,6 +321,19 @@ public class OptimizedRobot {
             }
         }
         return false;
+    }
+
+    /**
+     * Allow Using {@link OptimizedController#setToggle} with easy control names
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void setToggle(String controlName, boolean value) {
+        ControllerMapping.ControlInput input = controlMap.get(controlName);
+        if (input.controller == ControllerMapping.Controller.CONTROLLER1) {
+            controller1.setToggle(input.key, value);
+        } else {
+            controller2.setToggle(input.key, value);
+        }
     }
 
     /**

@@ -13,7 +13,6 @@ import org.firstinspires.ftc.internal.OptimizedController;
 import org.firstinspires.ftc.internal.OptimizedRobot;
 import org.firstinspires.ftc.internal.RobotConfig;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.finals.FreightFrenzyControllerMapping;
 
 @TeleOp(name = "Example TeleOP")
 @Disabled
@@ -39,9 +38,9 @@ public class ExampleTeleOp extends OpMode {
     @Override
     public void loop() {
         // Duck Spinner
-        if (robot.getControl("Motor")) {
+        if (robot.getControlBool("Motor")) {
             motor.setPower(RobotConfig.SPINNER_SPEED);
-        } else if (robot.getControl("ReverseDuck")) {
+        } else if (robot.getControlBool("ReverseDuck")) {
             motor.setPower(-RobotConfig.SPINNER_SPEED);
         } else {
             motor.setPower(robot.getControlFloat("DuckSpeedReverse") - robot.getControlFloat("DuckSpeed"));
